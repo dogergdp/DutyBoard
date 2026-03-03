@@ -1,0 +1,64 @@
+# Laravel
+/.phpunit.cache
+/bootstrap/ssr
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/resources/js/actions
+/resources/js/routes
+/resources/js/wayfinder
+/vendor
+
+# Environment
+.env
+.env.backup
+.env.*.backup
+.env.production
+.env.local
+.env.*.local
+.DS_Store
+
+# IDE / Editor
+.phpactor.json
+.phpunit.result.cache
+
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/auth.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# Misc
+/auth.json
+Homestead.json
+Homestead.yaml
+.vagrant/
+
+# AI Assistant Files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+boost.json
+.mcp.json
+.agents/
+.claude/
+.gemini/
+.idea/
+
