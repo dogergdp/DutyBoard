@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users, Columns, Folder, BookOpen } from 'lucide-react';
+import { Users, Columns, Folder, BookOpen } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -14,23 +14,20 @@ import {
 } from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
-import { dashboard, board, employees } from '@/routes';
+import admin from '@/routes/admin';
+import employees from '@/routes/employees';
+import { dashboard } from '@/routes';
 
 const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: board(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Task Board',
-        href: board(),
-        icon: Columns,
-    },
     {
         title: 'Employees',
         href: employees.index(),
         icon: Users,
+    },
+    {
+        title: 'Admin Tasks',
+        href: admin.tasks.index(),
+        icon: Columns,
     },
 ];
 
