@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { isPast } from 'date-fns';
+import { getEmployeeColor } from '../utils/employee-colors';
 import type { Employee, Task } from '../types';
 import TaskCard from './TaskCard';
 
@@ -27,16 +28,19 @@ export default function EmployeeColumn({
     currentTime = new Date(),
 }: EmployeeColumnProps) {
     const getInitials = useInitials();
+    const employeeColor = getEmployeeColor(employee.id);
 
     return (
         <div
             key={employee.id}
             className={cn(
-                'flex h-full min-w-[420px] max-w-[420px] flex-col rounded-xl border border-border bg-muted/30 p-5 2xl:min-w-[520px] 2xl:max-w-[520px] 2xl:p-6',
+                'flex h-full min-w-[420px] max-w-[420px] flex-col rounded-xl border-2 p-5 2xl:min-w-[520px] 2xl:max-w-[520px] 2xl:p-6',
                 animatedEmployeeId === employee.id ? 'animate-column-slide' : '',
+                employeeColor.bg,
+                employeeColor.border,
             )}
         >
-            <div className="mb-5 flex items-center justify-between border-b border-border pb-3 2xl:mb-6">
+            <div className={cn('mb-5 flex items-center justify-between border-b pb-3 2xl:mb-6', employeeColor.border)}>
                 <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14 border-2 border-primary/10 2xl:h-16 2xl:w-16">
                         <AvatarImage src={employee.photo_path || ''} alt={employee.full_name} />
