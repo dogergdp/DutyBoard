@@ -49,7 +49,7 @@ export const TASK_STATUS_COLORS = {
         bg: '#C3110C',
         border: '#740A03',
         text: 'text-white',
-        badge: 'bg-red-500 text-white',
+        badge: '#E6501B text-white',
         ring: 'ring-2 ring-red-500/50',
     },
 } as const;

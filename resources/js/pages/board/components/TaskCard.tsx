@@ -77,59 +77,59 @@ export default function TaskCard({
             )}
             style={inlineStyle}
         >
-            <CardHeader className={cn('p-3 pb-2 2xl:p-4 2xl:pb-2')}>
+            <CardHeader className={cn('p-2 pb-1 2xl:p-3 2xl:pb-1')}>
                 <div className="flex items-start justify-between gap-2">
-                    {/* Task name top left */}
-                    <CardTitle className={cn(
-                        'text-sm leading-tight font-bold 2xl:text-base',
-                        colorConfig.text,
-                        'self-start'
-                    )}>
-                        {task.title}
-                    </CardTitle>
-                    {/* Badges bottom right */}
-                    <div className="flex flex-col items-end justify-between flex-1 min-h-[2.5rem]">
-                        <div className="flex-1" />
-                        <div className="flex flex-wrap gap-2 mt-1 justify-end">
+                    {/* Task name + Status/Priority badges on left */}
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                        <CardTitle className={cn(
+                            'text-sm leading-tight font-bold 2xl:text-base',
+                            colorConfig.text,
+                        )}>
+                            {task.title}
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-1">
                             <Badge
                                 variant={getStatusVariant(task.status)}
-                                className="px-2 py-0 text-xs font-medium 2xl:text-sm"
+                                className="px-1.5 py-0 text-xs font-medium 2xl:text-sm whitespace-nowrap"
                             >
                                 {task.status}
                             </Badge>
                             <Badge
                                 variant={getPriorityVariant(task.priority)}
-                                className="px-2 py-0 text-xs font-medium 2xl:text-sm"
+                                className="px-1.5 py-0 text-xs font-medium 2xl:text-sm whitespace-nowrap"
                             >
                                 {task.priority}
                             </Badge>
-                            {overdue && (
-                                <Badge
-                                    variant="destructive"
-                                    className="px-2 py-0 text-xs font-bold uppercase animate-pulse"
-                                >
-                                    {getOverdueLabel()}
-                                </Badge>
-                            )}
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onToggle();
-                        }}
-                        className="flex-shrink-0 p-1 rounded hover:bg-muted/20 self-start"
-                        disabled={blocked}
-                    >
-                        <ChevronDown
-                            className={cn(
-                                'w-4 h-4 transition-transform',
-                                expanded && 'rotate-180',
-                                blocked && 'text-muted-foreground',
-                            )}
-                        />
-                    </button>
+                    {/* Top right: Overdue badge + Chevron */}
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                        {overdue && (
+                            <Badge
+                                variant="destructive"
+                                className="px-1.5 py-0 text-xs font-bold uppercase animate-pulse whitespace-nowrap"
+                            >
+                                {getOverdueLabel()}
+                            </Badge>
+                        )}
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggle();
+                            }}
+                            className="flex-shrink-0 p-1 rounded hover:bg-muted/20"
+                            disabled={blocked}
+                        >
+                            <ChevronDown
+                                className={cn(
+                                    'w-4 h-4 transition-transform',
+                                    expanded && 'rotate-180',
+                                    blocked && 'text-muted-foreground',
+                                )}
+                            />
+                        </button>
+                    </div>
                 </div>
             </CardHeader>
             {expanded && (
