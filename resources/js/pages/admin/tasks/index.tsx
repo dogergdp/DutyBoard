@@ -1,6 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { Pencil } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function AdminTasks({ tasks, employees, statuses, priorities, filters }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [editProcessing, setEditProcessing] = useState(false);
 
     const { data, setData, post, processing, reset, errors } = useForm({
         title: '',
@@ -67,6 +70,12 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
         status: 'ASSIGNED',
         priority: 'LOW',
         due_at: '',
+    });
+
+    const { data: editData, setData: setEditData, reset: resetEdit, errors: editErrors } = useForm({
+        title: '',
+        description: '',
+        priority: '',
     });
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -80,6 +89,47 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                 setCreateOpen(false);
             },
         });
+    };
+
+    const startEditTask = (task: Task) => {
+        setEditData({
+            title: task.title,
+            description: task.description,
+            priority: task.priority,
+        });
+        setEditingTaskId(task.id);
+    };
+
+    const submitEditTask = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+        if (editingTaskId) {
+            setEditProcessing(true);
+            router.patch(
+                `/admin/tasks/${editingTaskId}`,
+                {
+                    title: editData.title,
+                    description: editData.description,
+                    priority: editData.priority,
+                },
+                {
+                    onSuccess: () => {
+                        resetEdit();
+                        setEditingTaskId(null);
+                        setEditProcessing(false);
+                    },
+                    onError: () => {
+                        setEditProcessing(false);
+                    },
+                    preserveScroll: true,
+                }
+            );
+        }
+    };
+
+    const cancelEdit = () => {
+        resetEdit();
+        setEditingTaskId(null);
     };
 
     const updateTaskStatus = (taskId: number, status: string) => {
@@ -176,11 +226,15 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                                         className="rounded-md border p-4"
                                     >
                                         <div className="flex items-start justify-between gap-4">
-                                            <div className="space-y-1">
+                                            <div className="flex-1 space-y-2">
                                                 <p className="font-medium">{task.title}</p>
-                                                {task.description && (
-                                                    <p className="text-sm text-muted-foreground">{task.description}</p>
-                                                )}
+                                                <div className="min-h-10 max-h-10">
+                                                    {task.description && (
+                                                        <p className="text-sm text-muted-foreground line-clamp-2">
+                                                            {task.description}
+                                                        </p>
+                                                    )}
+                                                </div>
                                                 <p className="text-sm text-muted-foreground">
                                                     Assigned to: {task.employee?.full_name ?? 'Unknown'}
                                                 </p>
@@ -190,25 +244,35 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                                                     </p>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <select
-                                                    value={task.status}
-                                                    onChange={(event) =>
-                                                        updateTaskStatus(
-                                                            task.id,
-                                                            event.target.value,
-                                                        )
-                                                    }
-                                                    className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                            <div className="flex flex-col items-end gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <select
+                                                        value={task.status}
+                                                        onChange={(event) =>
+                                                            updateTaskStatus(
+                                                                task.id,
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                                    >
+                                                        {statuses.map((status) => (
+                                                            <option key={status} value={status}>
+                                                                {status}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <Badge variant="secondary">{task.priority}</Badge>
+                                                    {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => startEditTask(task)}
+                                                    className="h-8 w-8 p-0"
                                                 >
-                                                    {statuses.map((status) => (
-                                                        <option key={status} value={status}>
-                                                            {status}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <Badge variant="secondary">{task.priority}</Badge>
-                                                {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
@@ -341,6 +405,79 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                             </Button>
                             <Button type="submit" disabled={processing}>
                                 Create Task
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={editingTaskId !== null} onOpenChange={(open) => !open && cancelEdit()}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Task</DialogTitle>
+                        <DialogDescription>
+                            Update the task details below.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form onSubmit={submitEditTask} className="grid gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-title">Title</Label>
+                            <Input
+                                id="edit-title"
+                                value={editData.title}
+                                onChange={(event) =>
+                                    setEditData('title', event.target.value)
+                                }
+                                required
+                            />
+                            <InputError message={editErrors.title} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-description">Description</Label>
+                            <textarea
+                                id="edit-description"
+                                value={editData.description}
+                                onChange={(event) =>
+                                    setEditData('description', event.target.value)
+                                }
+                                className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-20 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                            />
+                            <InputError message={editErrors.description} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-priority">Priority</Label>
+                            <select
+                                id="edit-priority"
+                                value={editData.priority}
+                                onChange={(event) =>
+                                    setEditData('priority', event.target.value)
+                                }
+                                className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                                required
+                            >
+                                <option value="">Select priority</option>
+                                {priorities.map((priority) => (
+                                    <option key={priority} value={priority}>
+                                        {priority}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={editErrors.priority} />
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={cancelEdit}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={editProcessing}>
+                                Save Changes
                             </Button>
                         </DialogFooter>
                     </form>

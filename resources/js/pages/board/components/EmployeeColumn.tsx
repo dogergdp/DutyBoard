@@ -13,6 +13,7 @@ interface EmployeeColumnProps {
     disappearingTaskIds: number[];
     expandedTaskIds: number[];
     toggleTaskExpanded: (id: number) => void;
+    currentTime?: Date;
 }
 
 export default function EmployeeColumn({
@@ -23,6 +24,7 @@ export default function EmployeeColumn({
     disappearingTaskIds,
     expandedTaskIds,
     toggleTaskExpanded,
+    currentTime = new Date(),
 }: EmployeeColumnProps) {
     const getInitials = useInitials();
 
@@ -69,6 +71,7 @@ export default function EmployeeColumn({
                                 animated={animatedTaskIds.includes(task.id)}
                                 flipped={flippedTaskIds.includes(task.id)}
                                 disappearing={disappearingTaskIds.includes(task.id)}
+                                currentTime={currentTime}
                             />
                         );
                     })}

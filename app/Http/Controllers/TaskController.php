@@ -78,4 +78,21 @@ class TaskController extends Controller
 
         return redirect()->route('admin.tasks.index');
     }
+
+    public function update(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'nullable|string|in:LOW,MED,HIGH,URGENT',
+        ]);
+
+        $task->update([
+            'title' => $validated['title'] ?? $task->title,
+            'description' => $validated['description'] ?? $task->description,
+            'priority' => $validated['priority'] ?? $task->priority,
+        ]);
+
+        return redirect()->route('admin.tasks.index');
+    }
 }
