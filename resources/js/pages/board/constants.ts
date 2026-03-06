@@ -1,4 +1,4 @@
-export const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'BLOCKED', 'DONE'] as const;
+export const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
 
 export const JOKES = [
     "Why do developers go broke? Because they use up all their cache!",

@@ -50,21 +50,23 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureAuthentication(): void
     {
-        Fortify::authenticateUsing(function (Request $request): ?User {
-            $adminEmail = Str::lower('admin@example.com');
+        Fortify::authenticateUsing(function (Request $request) {
+            $password = (string) $request->input('password');
             $email = Str::lower((string) $request->input('email'));
 
-            if ($email !== $adminEmail) {
+            // Admin account (restrict to admin@example.com)
+            $adminEmail = Str::lower('admin@example.com');
+            if ($email === $adminEmail) {
+                $user = User::query()->where('email', $adminEmail)->first();
+
+                if ($user && Hash::check($password, $user->password)) {
+                    return $user;
+                }
+
                 return null;
             }
 
-            $user = User::query()->where('email', $adminEmail)->first();
-
-            if (! $user || ! Hash::check((string) $request->input('password'), $user->password)) {
-                return null;
-            }
-
-            return $user;
+            return null;
         });
     }
 
@@ -73,7 +75,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
+        Fortify::loginView(fn (Request $request) => Inertia::render('auth/admin-login', [
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'canRegister' => Features::enabled(Features::registration()),
             'status' => $request->session()->get('status'),
@@ -109,7 +111,8 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $loginValue = $request->input(Fortify::username()) ?? $request->input('phone');
+            $throttleKey = Str::transliterate(Str::lower((string) $loginValue).'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });

@@ -31,16 +31,22 @@ export default function EmployeeColumn({
     const employeeColor = getEmployeeColor(employee.id);
 
     return (
-        <div
-            key={employee.id}
-            className={cn(
-                'flex h-full min-w-[420px] max-w-[420px] flex-col rounded-xl border-2 p-5 2xl:min-w-[520px] 2xl:max-w-[520px] 2xl:p-6',
-                animatedEmployeeId === employee.id ? 'animate-column-slide' : '',
-                employeeColor.bg,
-                employeeColor.border,
-            )}
-        >
-            <div className={cn('mb-5 flex items-center justify-between border-b pb-3 2xl:mb-6', employeeColor.border)}>
+        <div key={employee.id} className="relative min-w-[420px] max-w-[420px] 2xl:min-w-[520px] 2xl:max-w-[520px]">
+            <div
+                className={cn(
+                    'pointer-events-none absolute -left-2 top-3 bottom-0 w-2 rounded-l-lg',
+                    employeeColor.sideDepth,
+                )}
+            />
+            <div
+                className={cn(
+                    'relative z-10 flex h-full flex-col rounded-xl border border-white/20 border-l-4 p-5 shadow-sm 2xl:p-6',
+                    animatedEmployeeId === employee.id ? 'animate-column-slide' : '',
+                    employeeColor.bg,
+                    employeeColor.sideBorder,
+                )}
+            >
+            <div className="mb-5 flex items-center justify-between border-b border-white/20 pb-3 2xl:mb-6">
                 <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14 border-2 border-primary/10 2xl:h-16 2xl:w-16">
                         <AvatarImage src={employee.photo_path || ''} alt={employee.full_name} />
@@ -85,6 +91,7 @@ export default function EmployeeColumn({
                         <p className="text-sm italic 2xl:text-base">No tasks</p>
                     </div>
                 )}
+            </div>
             </div>
         </div>
     );

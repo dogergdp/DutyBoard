@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import { request } from '@/routes/password';
 
 type Props = {
     status?: string;
@@ -14,20 +15,16 @@ type Props = {
     canRegister: boolean;
 };
 
-export default function Login({
-    status,
-    canResetPassword: _canResetPassword,
-    canRegister: _canRegister,
-}: Props) {
+export default function AdminLogin({ status, canResetPassword, canRegister }: Props) {
     return (
         <AuthLayout
-            title="Employee login"
-            description="Enter your phone number and password"
+            title="Admin login"
+            description="Enter your email and password"
         >
-            <Head title="Log in" />
+            <Head title="Admin log in" />
 
             <Form
-                action="/login"
+                action="/admin/login"
                 method="post"
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
@@ -36,23 +33,32 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="phone">Phone number</Label>
+                                <Label htmlFor="email">Email address</Label>
                                 <Input
-                                    id="phone"
-                                    type="tel"
-                                    name="phone"
+                                    id="email"
+                                    type="email"
+                                    name="email"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="tel"
-                                    placeholder="e.g. +1234567890"
+                                    autoComplete="email"
+                                    placeholder="email@example.com"
                                 />
-                                <InputError message={errors.phone} />
+                                <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
+                                    {canResetPassword && (
+                                        <TextLink
+                                            href={request()}
+                                            className="ml-auto text-sm"
+                                            tabIndex={5}
+                                        >
+                                            Forgot password?
+                                        </TextLink>
+                                    )}
                                 </div>
                                 <Input
                                     id="password"
@@ -86,11 +92,15 @@ export default function Login({
                                 Log in
                             </Button>
                         </div>
-                        <div className="text-center text-sm text-muted-foreground">
-                            <TextLink href="/admin/login" tabIndex={5}>
-                                Admin login
-                            </TextLink>
-                        </div>
+
+                        {canRegister && (
+                            <div className="text-center text-sm text-muted-foreground">
+                                Don't have an account?{' '}
+                                <TextLink href="/register" tabIndex={5}>
+                                    Sign up
+                                </TextLink>
+                            </div>
+                        )}
                     </>
                 )}
             </Form>

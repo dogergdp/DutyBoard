@@ -4,13 +4,12 @@
 // between status values and sound URLs, which the client can either
 // obtain from environment variables or via an API endpoint.
 
-export type SoundKey = 'ASSIGNED' | 'IN_PROGRESS' | 'REVIEW' | 'BLOCKED' | 'DONE';
+export type SoundKey = 'ASSIGNED' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
 
 export interface SoundUrls {
   ASSIGNED: string;
   IN_PROGRESS: string;
   REVIEW: string;
-  BLOCKED: string;
   DONE: string;
 }
 
@@ -23,7 +22,6 @@ export function getDefaultSoundUrls(): SoundUrls {
     ASSIGNED: import.meta.env.VITE_SOUND_ASSIGNED ?? '/sounds/assigned.mp3',
     IN_PROGRESS: import.meta.env.VITE_SOUND_IN_PROGRESS ?? '/sounds/in-progress.mp3',
     REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-    BLOCKED: import.meta.env.VITE_SOUND_BLOCKED ?? '/sounds/blocked.mp3',
     DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
   };
 }

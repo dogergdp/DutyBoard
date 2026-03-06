@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -38,6 +39,7 @@ class EmployeeController extends Controller
             'full_name' => $validated['full_name'],
             'mobile' => $validated['mobile'],
             'photo_path' => $photoPath,
+            'password' => Hash::make('password'),
         ]);
 
         return redirect()->back();

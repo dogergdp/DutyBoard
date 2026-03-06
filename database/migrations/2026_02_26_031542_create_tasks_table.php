@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->foreignId('assigned_to')->constrained('employees')->onDelete('cascade');
-            $table->string('status')->default('ASSIGNED'); // ASSIGNED, IN_PROGRESS, REVIEW, BLOCKED, DONE
+            $table->string('status')->default('ASSIGNED'); // ASSIGNED, IN_PROGRESS, REVIEW, DONE
             $table->string('priority')->default('LOW'); // LOW/MED/HIGH/URGENT
             $table->datetime('due_at')->nullable();
             $table->timestamps();

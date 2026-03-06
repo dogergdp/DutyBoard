@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'BLOCKED', 'DONE'] as const;
+const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
 
 export const useBoardSounds = () => {
     const [soundsReady, setSoundsReady] = useState(false);
@@ -15,7 +15,6 @@ export const useBoardSounds = () => {
             ASSIGNED: import.meta.env.VITE_SOUND_ASSIGNED ?? '/sounds/assigned.mp3',
             IN_PROGRESS: import.meta.env.VITE_SOUND_IN_PROGRESS ?? '/sounds/in-progress.mp3',
             REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-            BLOCKED: import.meta.env.VITE_SOUND_BLOCKED ?? '/sounds/blocked.mp3',
             DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
         }),
         [],
@@ -26,7 +25,6 @@ export const useBoardSounds = () => {
             ASSIGNED: '/sounds/assigned.wav',
             IN_PROGRESS: '/sounds/in-progress.wav',
             REVIEW: '/sounds/review.wav',
-            BLOCKED: '/sounds/blocked.wav',
             DONE: '/sounds/done.wav',
         }),
         [],

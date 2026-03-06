@@ -33,12 +33,6 @@ export const TASK_STATUS_COLORS = {
         text: 'text-yellow-950',
         badge: 'bg-yellow-100 text-yellow-800',
     },
-    BLOCKED: {
-        bg: '#BFC9D1',
-        border: '#25343F',
-        text: 'text-gray-600',
-        badge: 'bg-gray-300 text-gray-700',
-    },
     DONE: {
         bg: 'bg-green-50',
         border: 'border-l-green-500',

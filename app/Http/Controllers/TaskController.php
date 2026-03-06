@@ -9,7 +9,7 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    private const STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'BLOCKED', 'DONE'];
+    private const STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'];
     private const PRIORITIES = ['LOW', 'MED', 'HIGH', 'URGENT'];
 
     public function index(Request $request)
@@ -51,7 +51,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'assigned_to' => 'nullable|exists:employees,id',
             'employee_id' => 'nullable|exists:employees,id',
-            'status' => 'nullable|string|in:ASSIGNED,IN_PROGRESS,REVIEW,BLOCKED,DONE',
+            'status' => 'nullable|string|in:ASSIGNED,IN_PROGRESS,REVIEW,DONE',
             'priority' => 'nullable|string|in:LOW,MED,HIGH,URGENT',
             'due_at' => 'nullable|date',
             'deadline' => 'nullable|date',

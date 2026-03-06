@@ -152,6 +152,11 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
         });
     };
 
+    const tasksByStatus = statuses.reduce<Record<string, Task[]>>((grouped, status) => {
+        grouped[status] = tasks.filter((task) => task.status === status);
+        return grouped;
+    }, {});
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Tasks" />
@@ -215,74 +220,87 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            {tasks.map((task) => {
-                                const dueAt = task.due_at ? new Date(task.due_at) : null;
-                                const overdue = dueAt !== null && task.status !== 'DONE' && dueAt < new Date();
+                        <div className="flex gap-4 overflow-x-auto pb-2">
+                            {statuses.map((status) => {
+                                const columnTasks = tasksByStatus[status] ?? [];
 
                                 return (
-                                    <div
-                                        key={task.id}
-                                        className="rounded-md border p-4"
-                                    >
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex-1 space-y-2">
-                                                <p className="font-medium">{task.title}</p>
-                                                <div className="min-h-10 max-h-10">
-                                                    {task.description && (
-                                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                                            {task.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Assigned to: {task.employee?.full_name ?? 'Unknown'}
-                                                </p>
-                                                {task.due_at && (
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Due: {dueAt?.toLocaleString()}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-col items-end gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <select
-                                                        value={task.status}
-                                                        onChange={(event) =>
-                                                            updateTaskStatus(
-                                                                task.id,
-                                                                event.target.value,
-                                                            )
-                                                        }
-                                                        className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
-                                                    >
-                                                        {statuses.map((status) => (
-                                                            <option key={status} value={status}>
-                                                                {status}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    <Badge variant="secondary">{task.priority}</Badge>
-                                                    {overdue && <Badge variant="destructive">Overdue</Badge>}
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => startEditTask(task)}
-                                                    className="h-8 w-8 p-0"
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                    <div key={status} className="min-w-[320px] flex-1 space-y-3">
+                                        <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                                            <p className="text-sm font-semibold">{status.replace('_', ' ')}</p>
+                                            <Badge variant="outline">{columnTasks.length}</Badge>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            {columnTasks.map((task) => {
+                                                const dueAt = task.due_at ? new Date(task.due_at) : null;
+                                                const overdue = dueAt !== null && task.status !== 'DONE' && dueAt < new Date();
+
+                                                return (
+                                                    <div key={task.id} className="rounded-md border p-4">
+                                                        <div className="flex items-start justify-between gap-4">
+                                                            <div className="flex-1 space-y-2">
+                                                                <p className="font-medium">{task.title}</p>
+                                                                <div className="min-h-10 max-h-10">
+                                                                    {task.description && (
+                                                                        <p className="text-sm text-muted-foreground line-clamp-2">
+                                                                            {task.description}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    Assigned to: {task.employee?.full_name ?? 'Unknown'}
+                                                                </p>
+                                                                {task.due_at && (
+                                                                    <p className="text-sm text-muted-foreground">
+                                                                        Due: {dueAt?.toLocaleString()}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex flex-col items-end gap-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <select
+                                                                        value={task.status}
+                                                                        onChange={(event) =>
+                                                                            updateTaskStatus(task.id, event.target.value)
+                                                                        }
+                                                                        className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                                                    >
+                                                                        {statuses.map((nextStatus) => (
+                                                                            <option key={nextStatus} value={nextStatus}>
+                                                                                {nextStatus}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <Badge variant="secondary">{task.priority}</Badge>
+                                                                    {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                                </div>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => startEditTask(task)}
+                                                                    className="h-8 w-8 p-0"
+                                                                >
+                                                                    <Pencil className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+
+                                            {columnTasks.length === 0 && (
+                                                <p className="text-sm text-muted-foreground">No tasks</p>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
-
-                            {tasks.length === 0 && (
-                                <p className="text-sm text-muted-foreground">No tasks found for the selected filters.</p>
-                            )}
                         </div>
+
+                        {tasks.length === 0 && (
+                            <p className="text-sm text-muted-foreground">No tasks found for the selected filters.</p>
+                        )}
                     </CardContent>
                 </Card>
             </div>

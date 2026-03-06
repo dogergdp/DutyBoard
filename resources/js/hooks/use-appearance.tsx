@@ -10,7 +10,7 @@ export type UseAppearanceReturn = {
 };
 
 const listeners = new Set<() => void>();
-let currentAppearance: Appearance = 'system';
+let currentAppearance: Appearance = 'dark';
 
 const prefersDark = (): boolean => {
     if (typeof window === 'undefined') return false;
@@ -25,9 +25,7 @@ const setCookie = (name: string, value: string, days = 365): void => {
 };
 
 const getStoredAppearance = (): Appearance => {
-    if (typeof window === 'undefined') return 'system';
-
-    return (localStorage.getItem('appearance') as Appearance) || 'system';
+    return 'dark';
 };
 
 const isDarkMode = (appearance: Appearance): boolean => {
@@ -62,12 +60,10 @@ const handleSystemThemeChange = (): void => applyTheme(currentAppearance);
 export function initializeTheme(): void {
     if (typeof window === 'undefined') return;
 
-    if (!localStorage.getItem('appearance')) {
-        localStorage.setItem('appearance', 'system');
-        setCookie('appearance', 'system');
-    }
+    localStorage.setItem('appearance', 'dark');
+    setCookie('appearance', 'dark');
 
-    currentAppearance = getStoredAppearance();
+    currentAppearance = 'dark';
     applyTheme(currentAppearance);
 
     // Set up system theme change listener
@@ -87,15 +83,15 @@ export function useAppearance(): UseAppearanceReturn {
     );
 
     const updateAppearance = useCallback((mode: Appearance): void => {
-        currentAppearance = mode;
+        currentAppearance = 'dark';
 
         // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
+        localStorage.setItem('appearance', 'dark');
 
         // Store in cookie for SSR...
-        setCookie('appearance', mode);
+        setCookie('appearance', 'dark');
 
-        applyTheme(mode);
+        applyTheme('dark');
         notify();
     }, []);
 

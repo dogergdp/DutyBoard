@@ -28,7 +28,6 @@ export default function TaskCard({
 }: TaskCardProps) {
     const dueDate = task.due_at ? new Date(task.due_at) : null;
     const overdue = dueDate && isPast(dueDate) && task.status !== 'DONE';
-    const blocked = task.status === 'BLOCKED';
     const age = formatDistanceToNow(new Date(task.created_at), { addSuffix: true });
 
     const getOverdueLabel = () => {
@@ -69,7 +68,6 @@ export default function TaskCard({
                 // If config uses Tailwind classes for bg/border, keep them; otherwise inline styles will apply
                 !isHex(colorConfig.bg) && colorConfig.bg,
                 !isHex(colorConfig.border) && colorConfig.border,
-                blocked && (colorConfig as any).opacity,
                 overdue && (colorConfig as any).ring,
                 overdue && 'animate-pulse-light',
                 // control max-height to create a consistent card size and animate expansion
@@ -119,13 +117,11 @@ export default function TaskCard({
                                 onToggle();
                             }}
                             className="flex-shrink-0 p-1 rounded hover:bg-muted/20"
-                            disabled={blocked}
                         >
                             <ChevronDown
                                 className={cn(
                                     'w-4 h-4 transition-transform',
                                     expanded && 'rotate-180',
-                                    blocked && 'text-muted-foreground',
                                 )}
                             />
                         </button>
@@ -139,14 +135,14 @@ export default function TaskCard({
                 )}>
                     <p className={cn(
                         'text-xs',
-                        blocked ? 'text-muted-foreground' : colorConfig.text,
+                        colorConfig.text,
                     )}>
                         {task.description}
                     </p>
                     <div className="grid gap-2">
                         <div className={cn(
                             'flex items-center justify-between rounded px-2 py-1 text-xs font-semibold 2xl:text-sm',
-                            blocked ? 'bg-muted text-muted-foreground' : `${colorConfig.bg} ${colorConfig.text}`
+                            `${colorConfig.bg} ${colorConfig.text}`
                         )}>
                             <span>Created: {age}</span>
                         </div>
@@ -154,9 +150,7 @@ export default function TaskCard({
                             <div
                                 className={cn(
                                     'flex items-center justify-between rounded px-2 py-1 text-xs font-semibold 2xl:text-sm',
-                                    blocked
-                                        ? 'bg-muted text-muted-foreground'
-                                        : `${colorConfig.bg} ${colorConfig.text}`
+                                    `${colorConfig.bg} ${colorConfig.text}`
                                 )}
                             >
                                 <span>

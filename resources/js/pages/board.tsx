@@ -69,7 +69,7 @@ type TaskSnapshot = Record<
 >;
 
 export default function Board({ employees }: BoardProps) {
-    const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'BLOCKED', 'DONE'] as const;
+    const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
 
     const JOKES = [
         "Why do developers go broke? Because they use up all their cache!",
@@ -123,8 +123,6 @@ export default function Board({ employees }: BoardProps) {
                 import.meta.env.VITE_SOUND_IN_PROGRESS ??
                 '/sounds/in-progress.mp3',
             REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-            BLOCKED:
-                import.meta.env.VITE_SOUND_BLOCKED ?? '/sounds/blocked.mp3',
             DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
         }),
         [],
@@ -135,7 +133,6 @@ export default function Board({ employees }: BoardProps) {
             ASSIGNED: '/sounds/assigned.wav',
             IN_PROGRESS: '/sounds/in-progress.wav',
             REVIEW: '/sounds/review.wav',
-            BLOCKED: '/sounds/blocked.wav',
             DONE: '/sounds/done.wav',
         }),
         [],
@@ -527,7 +524,6 @@ export default function Board({ employees }: BoardProps) {
             case 'DONE': return 'default';
             case 'IN_PROGRESS': return 'secondary';
             case 'REVIEW': return 'outline';
-            case 'BLOCKED': return 'destructive';
             default: return 'outline';
         }
     };

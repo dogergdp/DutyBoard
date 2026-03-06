@@ -61,7 +61,7 @@ class BoardController extends Controller
         // In a real app, use Gate::authorize or similar.
 
         $request->validate([
-            'status' => 'required|string|in:ASSIGNED,IN_PROGRESS,REVIEW,BLOCKED,DONE',
+            'status' => 'required|string|in:ASSIGNED,IN_PROGRESS,REVIEW,DONE',
         ]);
 
         $task->update([

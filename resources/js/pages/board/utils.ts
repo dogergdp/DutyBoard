@@ -12,7 +12,6 @@ export const getStatusVariant = (status: string) => {
         case 'DONE': return 'default';
         case 'IN_PROGRESS': return 'secondary';
         case 'REVIEW': return 'outline';
-        case 'BLOCKED': return 'destructive';
         default: return 'outline';
     }
 };
