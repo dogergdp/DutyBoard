@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { formatDistanceToNow, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { getStatusVariant, getPriorityVariant, formatInManila } from '../utils';
+import { formatInManila } from '../utils';
 import { TASK_STATUS_COLORS } from '../config/status-colors';
 import type { Task } from '../types';
 
@@ -26,9 +26,23 @@ export default function TaskCard({
     disappearing,
     currentTime = new Date(),
 }: TaskCardProps) {
+    const [progressDots, setProgressDots] = useState('');
     const dueDate = task.due_at ? new Date(task.due_at) : null;
     const overdue = dueDate && isPast(dueDate) && task.status !== 'DONE';
     const age = formatDistanceToNow(new Date(task.created_at), { addSuffix: true });
+
+    useEffect(() => {
+        if (task.status !== 'IN_PROGRESS') {
+            setProgressDots('');
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setProgressDots((previous) => (previous.length >= 3 ? '' : `${previous}.`));
+        }, 400);
+
+        return () => clearInterval(interval);
+    }, [task.status]);
 
     const getOverdueLabel = () => {
         if (!overdue || !dueDate) return null;
@@ -57,11 +71,28 @@ export default function TaskCard({
     // If border is a hex value, apply it to the left border color
     if (isHex(colorConfig.border)) inlineStyle.borderLeftColor = colorConfig.border as string;
 
+    const statusText = () => {
+        if (task.status === 'IN_PROGRESS') {
+            return (
+                <span className={cn('whitespace-nowrap', colorConfig.text)}>
+                    In Progress
+                    <span className="inline-block min-w-[1.5ch] text-left">{progressDots}</span>
+                </span>
+            );
+        }
+
+        if (task.status === 'ASSIGNED') {
+            return 'Assigned';
+        }
+
+        return task.status.replace('_', ' ').toLowerCase().replace(/(^|\s)\S/g, (char) => char.toUpperCase());
+    };
+
     return (
         <Card
             key={task.id}
             className={cn(
-                'shadow-sm hover:shadow-md transition-all border-l-4 overflow-hidden transition-max-h',
+                'shadow-sm hover:shadow-md transition-all overflow-hidden transition-max-h',
                 animated ? 'animate-task-slide-in' : '',
                 flipped ? 'animate-task-flip' : '',
                 disappearing ? 'animate-task-disappear' : '',
@@ -75,7 +106,7 @@ export default function TaskCard({
             )}
             style={inlineStyle}
         >
-            <CardHeader className={cn('p-2 pb-1 2xl:p-3 2xl:pb-1')}>
+            <CardHeader className={cn('relative p-2 pb-6 2xl:p-3 2xl:pb-7')}>
                 <div className="flex items-start justify-between gap-2">
                     {/* Task name + Status/Priority badges on left */}
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -85,30 +116,13 @@ export default function TaskCard({
                         )}>
                             {task.title}
                         </CardTitle>
-                        <div className="flex flex-wrap gap-1">
-                            <Badge
-                                variant={getStatusVariant(task.status)}
-                                className="px-1.5 py-0 text-xs font-medium 2xl:text-sm whitespace-nowrap"
-                            >
-                                {task.status}
-                            </Badge>
-                            <Badge
-                                variant={getPriorityVariant(task.priority)}
-                                className="px-1.5 py-0 text-xs font-medium 2xl:text-sm whitespace-nowrap"
-                            >
-                                {task.priority}
-                            </Badge>
-                        </div>
                     </div>
-                    {/* Top right: Overdue badge + Chevron */}
+                    {/* Top right: Overdue text + Chevron */}
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                         {overdue && (
-                            <Badge
-                                variant="destructive"
-                                className="px-1.5 py-0 text-xs font-bold uppercase animate-pulse whitespace-nowrap"
-                            >
+                            <span className="text-xs font-bold uppercase text-destructive animate-pulse whitespace-nowrap">
                                 {getOverdueLabel()}
-                            </Badge>
+                            </span>
                         )}
                         <button
                             type="button"
@@ -126,6 +140,9 @@ export default function TaskCard({
                             />
                         </button>
                     </div>
+                </div>
+                <div className="pointer-events-none absolute right-2 bottom-1 2xl:right-3 2xl:bottom-2">
+                    <span className={cn('text-xs font-semibold 2xl:text-sm', colorConfig.text)}>{statusText()}</span>
                 </div>
             </CardHeader>
             {expanded && (

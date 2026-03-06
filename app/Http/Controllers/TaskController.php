@@ -85,12 +85,14 @@ class TaskController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'nullable|string|in:LOW,MED,HIGH,URGENT',
+            'due_at' => 'nullable|date',
         ]);
 
         $task->update([
             'title' => $validated['title'] ?? $task->title,
             'description' => $validated['description'] ?? $task->description,
             'priority' => $validated['priority'] ?? $task->priority,
+            'due_at' => $validated['due_at'] ?? null,
         ]);
 
         return redirect()->route('admin.tasks.index');

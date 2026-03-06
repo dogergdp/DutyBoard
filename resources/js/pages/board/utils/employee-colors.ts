@@ -4,14 +4,14 @@
  */
 
 const EMPLOYEE_COLOR_PALETTE = [
-    { bg: 'bg-rose-50/90', sideBorder: 'border-l-rose-300/80', sideDepth: 'bg-rose-300/45', accent: 'bg-rose-100/80' },
-    { bg: 'bg-lime-50/90', sideBorder: 'border-l-lime-300/80', sideDepth: 'bg-lime-300/45', accent: 'bg-lime-100/80' },
-    { bg: 'bg-cyan-50/90', sideBorder: 'border-l-cyan-300/80', sideDepth: 'bg-cyan-300/45', accent: 'bg-cyan-100/80' },
-    { bg: 'bg-amber-50/90', sideBorder: 'border-l-amber-300/80', sideDepth: 'bg-amber-300/45', accent: 'bg-amber-100/80' },
-    { bg: 'bg-violet-50/90', sideBorder: 'border-l-violet-300/80', sideDepth: 'bg-violet-300/45', accent: 'bg-violet-100/80' },
-    { bg: 'bg-orange-50/90', sideBorder: 'border-l-orange-300/80', sideDepth: 'bg-orange-300/45', accent: 'bg-orange-100/80' },
-    { bg: 'bg-red-50/90', sideBorder: 'border-l-red-300/80', sideDepth: 'bg-red-300/45', accent: 'bg-red-100/80' },
-    { bg: 'bg-sky-50/90', sideBorder: 'border-l-sky-300/80', sideDepth: 'bg-sky-300/45', accent: 'bg-sky-100/80' },
+    { bg: 'bg-rose-200', sideBorder: 'border-l-rose-800/90', sideDepth: 'bg-rose-900/80', accent: 'border-rose-800/70', textAccent: 'text-rose-900' },
+    { bg: 'bg-lime-200', sideBorder: 'border-l-lime-800/90', sideDepth: 'bg-lime-900/80', accent: 'border-lime-800/70', textAccent: 'text-lime-900' },
+    { bg: 'bg-cyan-200', sideBorder: 'border-l-cyan-800/90', sideDepth: 'bg-cyan-900/80', accent: 'border-cyan-800/70', textAccent: 'text-cyan-900' },
+    { bg: 'bg-amber-200', sideBorder: 'border-l-amber-800/90', sideDepth: 'bg-amber-900/80', accent: 'border-amber-800/70', textAccent: 'text-amber-900' },
+    { bg: 'bg-violet-200', sideBorder: 'border-l-violet-800/90', sideDepth: 'bg-violet-900/80', accent: 'border-violet-800/70', textAccent: 'text-violet-900' },
+    { bg: 'bg-orange-200', sideBorder: 'border-l-orange-800/90', sideDepth: 'bg-orange-900/80', accent: 'border-orange-800/70', textAccent: 'text-orange-900' },
+    { bg: 'bg-red-200', sideBorder: 'border-l-red-800/90', sideDepth: 'bg-red-900/80', accent: 'border-red-800/70', textAccent: 'text-red-900' },
+    { bg: 'bg-sky-200', sideBorder: 'border-l-sky-800/90', sideDepth: 'bg-sky-900/80', accent: 'border-sky-800/70', textAccent: 'text-sky-900' },
 ];
 
 export interface EmployeeColorConfig {
@@ -19,6 +19,7 @@ export interface EmployeeColorConfig {
     sideBorder: string;
     sideDepth: string;
     accent: string;
+    textAccent: string;
 }
 
 /**

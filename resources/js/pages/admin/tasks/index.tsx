@@ -76,7 +76,15 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
         title: '',
         description: '',
         priority: '',
+        due_at: '',
     });
+
+    const toDateTimeLocalValue = (value: string | null) => {
+        if (!value) return '';
+        const date = new Date(value);
+        const timezoneOffsetInMs = date.getTimezoneOffset() * 60_000;
+        return new Date(date.getTime() - timezoneOffsetInMs).toISOString().slice(0, 16);
+    };
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -96,6 +104,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
             title: task.title,
             description: task.description,
             priority: task.priority,
+            due_at: toDateTimeLocalValue(task.due_at),
         });
         setEditingTaskId(task.id);
     };
@@ -111,6 +120,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                     title: editData.title,
                     description: editData.description,
                     priority: editData.priority,
+                    due_at: editData.due_at || null,
                 },
                 {
                     onSuccess: () => {
@@ -484,6 +494,19 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                                 ))}
                             </select>
                             <InputError message={editErrors.priority} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-due-at">Due date/time</Label>
+                            <Input
+                                id="edit-due-at"
+                                type="datetime-local"
+                                value={editData.due_at}
+                                onChange={(event) =>
+                                    setEditData('due_at', event.target.value)
+                                }
+                            />
+                            <InputError message={editErrors.due_at} />
                         </div>
 
                         <DialogFooter>
