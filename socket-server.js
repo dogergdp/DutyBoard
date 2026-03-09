@@ -1,6 +1,9 @@
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const PORT = Number(process.env.SOCKET_IO_PORT ?? 6002);
 const HOST = process.env.SOCKET_IO_HOST ?? '0.0.0.0';
