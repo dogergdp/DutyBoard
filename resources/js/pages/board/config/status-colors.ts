@@ -16,25 +16,25 @@ export type StatusColorWithOptional = StatusColorBase & {
 
 export const TASK_STATUS_COLORS = {
     ASSIGNED: {
-        bg: 'bg-blue-50',
+        bg: '#F5F5F5',
         border: 'border-l-blue-500',
         text: 'text-blue-950',
         badge: 'bg-blue-100 text-blue-800',
     },
     IN_PROGRESS: {
-        bg: 'bg-purple-50',
+        bg: '#F5F5F5',
         border: 'border-l-purple-500',
         text: 'text-purple-950',
         badge: 'bg-purple-100 text-purple-800',
     },
     REVIEW: {
-        bg: 'bg-yellow-50',
+        bg: '#F5F5F5',
         border: 'border-l-yellow-500',
         text: 'text-yellow-950',
         badge: 'bg-yellow-100 text-yellow-800',
     },
     DONE: {
-        bg: 'bg-green-50',
+        bg: '#F5F5F5',
         border: 'border-l-green-500',
         text: 'text-green-950',
         badge: 'bg-green-100 text-green-800',

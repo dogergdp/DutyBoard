@@ -62,6 +62,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
     const [createOpen, setCreateOpen] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
     const [editProcessing, setEditProcessing] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
     const { data, setData, post, processing, reset, errors } = useForm({
         title: '',
@@ -231,9 +232,108 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                             </div>
                         </div>
 
+                        {/* Status Pill Navigation */}
+                        <div className="flex gap-2 flex-wrap mt-4">
+                            <Button
+                                variant={selectedStatus === null ? 'default' : 'outline'}
+                                onClick={() => setSelectedStatus(null)}
+                                className="rounded-full"
+                                size="sm"
+                            >
+                                All
+                            </Button>
+                            {statuses.map((status) => (
+                                <Button
+                                    key={status}
+                                    variant={selectedStatus === status ? 'default' : 'outline'}
+                                    onClick={() => setSelectedStatus(status)}
+                                    className="rounded-full"
+                                    size="sm"
+                                >
+                                    {status.replace('_', ' ')} ({tasksByStatus[status]?.length ?? 0})
+                                </Button>
+                            ))}
+                        </div>
+
                         {/* Kanban Board Section */}
                         <div className="h-[60vh] overflow-y-auto mt-4">
-                            <div className="flex gap-4 overflow-x-auto pb-2">
+                            {selectedStatus ? (
+                                // Single Status View
+                                <div className="space-y-3">
+                                    {tasksByStatus[selectedStatus]?.map((task) => {
+                                        const dueAt = task.due_at ? new Date(task.due_at) : null;
+                                        const overdue = dueAt !== null && task.status !== 'DONE' && dueAt < new Date();
+
+                                        return (
+                                            <div key={task.id} className="rounded-md border p-4">
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="flex-1 space-y-2">
+                                                        <p className="font-medium">{task.title}</p>
+                                                        <div className="min-h-10 max-h-10">
+                                                            {task.description && (
+                                                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                                                    {task.description}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Assigned to: {task.employee?.full_name ?? 'Unknown'}
+                                                        </p>
+                                                        {task.due_at && (
+                                                            <p className="text-sm text-muted-foreground">
+                                                                Due: {dueAt?.toLocaleString()}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col items-end gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <select
+                                                                value={task.status}
+                                                                onChange={(event) =>
+                                                                    updateTaskStatus(task.id, event.target.value)
+                                                                }
+                                                                className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                                            >
+                                                                {statuses.map((nextStatus) => (
+                                                                    <option key={nextStatus} value={nextStatus}>
+                                                                        {nextStatus}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <Badge variant="secondary">{task.priority}</Badge>
+                                                            {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                        </div>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => startEditTask(task)}
+                                                            className="h-8 w-8 p-0"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        {task.status === 'REVIEW' && (
+                                                            <Button
+                                                                variant="default"
+                                                                size="sm"
+                                                                onClick={() => updateTaskStatus(task.id, 'DONE')}
+                                                                className="h-8 px-3 text-xs"
+                                                            >
+                                                                Approve
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    {tasksByStatus[selectedStatus]?.length === 0 && (
+                                        <p className="text-sm text-muted-foreground">No tasks in this status.</p>
+                                    )}
+                                </div>
+                            ) : (
+                                // Multi-Status Kanban View
+                                <div className="flex gap-4 overflow-x-auto pb-2">
                                 {statuses.map((status) => {
                                     const columnTasks = tasksByStatus[status] ?? [];
 
@@ -296,6 +396,16 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                                                                     >
                                                                         <Pencil className="h-4 w-4" />
                                                                     </Button>
+                                                                    {task.status === 'REVIEW' && (
+                                                                        <Button
+                                                                            variant="default"
+                                                                            size="sm"
+                                                                            onClick={() => updateTaskStatus(task.id, 'DONE')}
+                                                                            className="h-8 px-3 text-xs"
+                                                                        >
+                                                                            Approve
+                                                                        </Button>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -310,6 +420,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                                     );
                                 })}
                             </div>
+                            )}
                         </div>
 
                         {tasks.length === 0 && (

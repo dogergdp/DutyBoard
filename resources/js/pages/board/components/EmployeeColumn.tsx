@@ -34,16 +34,21 @@ export default function EmployeeColumn({
     );
 
     return (
-        <div key={employee.id} className="relative min-w-[420px] max-w-[420px] 2xl:min-w-[520px] 2xl:max-w-[520px] flex flex-col h-full">
+        <div key={employee.id} className="relative min-w-[420px] max-w-[420px] 2xl:min-w-[520px] 2xl:max-w-[520px] flex flex-col h-full overflow-visible">
             <div
                 className={cn(
-                    'pointer-events-none absolute -left-3 top-4 -bottom-2 w-3 rounded-l-xl shadow-sm',
+                    'pointer-events-none absolute -left-3 top-4 -bottom-3 w-3 rounded-l-xl shadow-2xl z-30',
                     employeeColor.sideDepth,
                 )}
             />
             <div
                 className={cn(
-                    'relative z-10 flex h-full flex-col rounded-xl border p-5 shadow-sm 2xl:p-6 overflow-hidden',
+                    'pointer-events-none absolute -bottom-3 -left-3 right-4 h-3 rounded-b-xl shadow-2xl z-30',
+                    employeeColor.sideDepth,
+                )}
+            />            <div
+                className={cn(
+                    'relative z-10 flex h-full flex-col rounded-xl border p-5 shadow-sm 2xl:p-6 overflow-visible',
                     animatedEmployeeId === employee.id ? 'animate-column-slide' : '',
                     employeeColor.bg,
                     employeeColor.accent,
@@ -76,22 +81,17 @@ export default function EmployeeColumn({
                         <p className={cn('text-3xl font-bold 2xl:text-4xl', employeeColor.textAccent)}>No tasks</p>
                     </div>
                 ) : (
-                    visibleTasks.map((task) => {
-                        const isExpanded = expandedTaskIds.includes(task.id);
-                        return (
-                            <div key={task.id} className="flex-shrink-0">
-                                <TaskCard
-                                    task={task}
-                                    expanded={isExpanded}
-                                    onToggle={() => toggleTaskExpanded(task.id)}
-                                    animated={animatedTaskIds.includes(task.id)}
-                                    flipped={flippedTaskIds.includes(task.id)}
-                                    disappearing={disappearingTaskIds.includes(task.id)}
-                                    currentTime={currentTime}
-                                />
-                            </div>
-                        );
-                    })
+                    visibleTasks.map((task) => (
+                        <div key={task.id} className="flex-shrink-0">
+                            <TaskCard
+                                task={task}
+                                animated={animatedTaskIds.includes(task.id)}
+                                flipped={flippedTaskIds.includes(task.id)}
+                                disappearing={disappearingTaskIds.includes(task.id)}
+                                currentTime={currentTime}
+                            />
+                        </div>
+                    ))
                 )}
             </div>
             </div>

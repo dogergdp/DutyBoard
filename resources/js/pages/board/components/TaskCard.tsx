@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow, isPast, differenceInDays, differenceInHours } from 'date-fns';
@@ -9,8 +10,6 @@ import type { Task } from '../types';
 
 interface TaskCardProps {
     task: Task;
-    expanded: boolean;
-    onToggle: () => void;
     animated: boolean;
     flipped: boolean;
     disappearing: boolean;
@@ -19,13 +18,12 @@ interface TaskCardProps {
 
 export default function TaskCard({
     task,
-    expanded,
-    onToggle,
     animated,
     flipped,
     disappearing,
     currentTime = new Date(),
 }: TaskCardProps) {
+    const [hovered, setHovered] = useState(false);
     const [progressDots, setProgressDots] = useState('');
     const dueDate = task.due_at ? new Date(task.due_at) : null;
     const overdue = dueDate && isPast(dueDate) && task.status !== 'DONE';
@@ -89,76 +87,66 @@ export default function TaskCard({
     };
 
     return (
-        <Card
-            key={task.id}
-            className={cn(
-                'shadow-sm hover:shadow-md transition-all overflow-hidden transition-max-h',
-                animated ? 'animate-task-slide-in' : '',
-                flipped ? 'animate-task-flip' : '',
-                disappearing ? 'animate-task-disappear' : '',
-                // If config uses Tailwind classes for bg/border, keep them; otherwise inline styles will apply
-                !isHex(colorConfig.bg) && colorConfig.bg,
-                !isHex(colorConfig.border) && colorConfig.border,
-                overdue && (colorConfig as any).ring,
-                overdue && 'animate-pulse-light',
-                // control max-height to create a consistent card size and animate expansion
-                expanded ? 'max-h-[700px] animate-task-expand' : 'max-h-20'
-            )}
-            style={inlineStyle}
+        <div
+            className="relative cursor-pointer"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
-            <CardHeader className={cn('relative p-2 pb-6 2xl:p-3 2xl:pb-7')}>
+            <Card
+                className={cn(
+                    'relative shadow-sm hover:shadow-md transition-all overflow-visible transition-max-h ml-2 mb-2',
+                    animated ? 'animate-task-slide-in' : '',
+                    flipped ? 'animate-task-flip' : '',
+                    disappearing ? 'animate-task-disappear' : '',
+                    !isHex(colorConfig.bg) && colorConfig.bg,
+                    !isHex(colorConfig.border) && colorConfig.border,
+                    overdue && (colorConfig as any).ring,
+                    overdue && 'animate-pulse-light',
+                    hovered ? 'max-h-[900px] animate-task-expand' : 'max-h-28'
+                )}
+                style={inlineStyle}
+            >
+                {/* Top right corner: Overdue badge - fixed position */}
+                {overdue && (
+                    <div className="absolute -top-3 -right-3 w-40 h-10 flex items-center justify-center bg-destructive text-white rounded animate-pulse z-50">
+                        <span className="text-sm font-bold text-center text-white px-1">{getOverdueLabel()}</span>
+                    </div>
+                )}
+            <CardHeader className={cn('relative px-3 py-2 2xl:px-4 2xl:py-2')}>
+                {/* Title row with priority and overdue badge */}
                 <div className="flex items-start justify-between gap-2">
-                    {/* Task name + Status/Priority badges on left */}
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                        <CardTitle className={cn(
-                            'text-sm leading-tight font-bold 2xl:text-base',
-                            colorConfig.text,
-                        )}>
-                            {task.title}
-                        </CardTitle>
-                    </div>
-                    {/* Top right: Overdue text + Chevron */}
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {overdue && (
-                            <span className="text-xs font-bold uppercase text-destructive animate-pulse whitespace-nowrap">
-                                {getOverdueLabel()}
-                            </span>
-                        )}
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onToggle();
-                            }}
-                            className="flex-shrink-0 p-1 rounded hover:bg-muted/20"
-                        >
-                            <ChevronDown
-                                className={cn(
-                                    'w-4 h-4 transition-transform',
-                                    expanded && 'rotate-180',
-                                )}
-                            />
-                        </button>
-                    </div>
+                    <CardTitle className={cn(
+                        'text-2xl leading-tight font-black 2xl:text-xl flex-1',
+                        colorConfig.text,
+                        hovered ? '' : 'truncate'
+                    )}>
+                        {task.title}
+                    </CardTitle>
+
                 </div>
-                <div className="pointer-events-none absolute right-2 bottom-1 2xl:right-3 2xl:bottom-2">
-                    <span className={cn('text-xs font-semibold 2xl:text-sm', colorConfig.text)}>{statusText()}</span>
+                {/* Priority and Status row */}
+                <div className="flex items-center justify-between mt-1.5">
+                    <Badge className="bg-secondary text-secondary-foreground hover:bg-secondary">
+                        {task.priority}
+                    </Badge>
+                    {/* Status text */}
+                    <span className={cn('text-lg  2xl:text-l', colorConfig.text)}>{statusText()}</span>
                 </div>
             </CardHeader>
-            {expanded && (
+            {hovered && (
                 <CardContent className={cn(
                     'space-y-2 p-3 pt-0 2xl:p-4 2xl:pt-0',
                     colorConfig.text
                 )}>
                     <p className={cn(
-                        'text-xs',
+                        'text-lg',
                         colorConfig.text,
                     )}>
                         {task.description}
                     </p>
                     <div className="grid gap-2">
                         <div className={cn(
-                            'flex items-center justify-between rounded px-2 py-1 text-xs font-semibold 2xl:text-sm',
+                            'flex items-center justify-between rounded px-2 py-1 text-lg font-semibold 2xl:text-2xl',
                             `${colorConfig.bg} ${colorConfig.text}`
                         )}>
                             <span>Created: {age}</span>
@@ -166,7 +154,7 @@ export default function TaskCard({
                         {task.due_at && (
                             <div
                                 className={cn(
-                                    'flex items-center justify-between rounded px-2 py-1 text-xs font-semibold 2xl:text-sm',
+                                    'flex items-center justify-between rounded px-2 py-1 text-lg font-semibold 2xl:text-2xl',
                                     `${colorConfig.bg} ${colorConfig.text}`
                                 )}
                             >
@@ -185,6 +173,7 @@ export default function TaskCard({
                     </div>
                 </CardContent>
             )}
-        </Card>
+            </Card>
+        </div>
     );
 }
