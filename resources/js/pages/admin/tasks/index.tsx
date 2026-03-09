@@ -181,6 +181,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                         <CardTitle>Tasks</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {/* Filters Section */}
                         <div className="grid gap-4 md:grid-cols-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="filter-employee">Filter by employee</Label>
@@ -230,82 +231,85 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                             </div>
                         </div>
 
-                        <div className="flex gap-4 overflow-x-auto pb-2">
-                            {statuses.map((status) => {
-                                const columnTasks = tasksByStatus[status] ?? [];
+                        {/* Kanban Board Section */}
+                        <div className="h-[60vh] overflow-y-auto mt-4">
+                            <div className="flex gap-4 overflow-x-auto pb-2">
+                                {statuses.map((status) => {
+                                    const columnTasks = tasksByStatus[status] ?? [];
 
-                                return (
-                                    <div key={status} className="min-w-[320px] flex-1 space-y-3">
-                                        <div className="flex items-center justify-between rounded-md border px-3 py-2">
-                                            <p className="text-sm font-semibold">{status.replace('_', ' ')}</p>
-                                            <Badge variant="outline">{columnTasks.length}</Badge>
-                                        </div>
+                                    return (
+                                        <div key={status} className="min-w-[320px] flex-1 space-y-3">
+                                            <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                                                <p className="text-sm font-semibold">{status.replace('_', ' ')}</p>
+                                                <Badge variant="outline">{columnTasks.length}</Badge>
+                                            </div>
 
-                                        <div className="space-y-3">
-                                            {columnTasks.map((task) => {
-                                                const dueAt = task.due_at ? new Date(task.due_at) : null;
-                                                const overdue = dueAt !== null && task.status !== 'DONE' && dueAt < new Date();
+                                            <div className="space-y-3">
+                                                {columnTasks.map((task) => {
+                                                    const dueAt = task.due_at ? new Date(task.due_at) : null;
+                                                    const overdue = dueAt !== null && task.status !== 'DONE' && dueAt < new Date();
 
-                                                return (
-                                                    <div key={task.id} className="rounded-md border p-4">
-                                                        <div className="flex items-start justify-between gap-4">
-                                                            <div className="flex-1 space-y-2">
-                                                                <p className="font-medium">{task.title}</p>
-                                                                <div className="min-h-10 max-h-10">
-                                                                    {task.description && (
-                                                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                                                            {task.description}
+                                                    return (
+                                                        <div key={task.id} className="rounded-md border p-4">
+                                                            <div className="flex items-start justify-between gap-4">
+                                                                <div className="flex-1 space-y-2">
+                                                                    <p className="font-medium">{task.title}</p>
+                                                                    <div className="min-h-10 max-h-10">
+                                                                        {task.description && (
+                                                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                                                                {task.description}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                    <p className="text-sm text-muted-foreground">
+                                                                        Assigned to: {task.employee?.full_name ?? 'Unknown'}
+                                                                    </p>
+                                                                    {task.due_at && (
+                                                                        <p className="text-sm text-muted-foreground">
+                                                                            Due: {dueAt?.toLocaleString()}
                                                                         </p>
                                                                     )}
                                                                 </div>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    Assigned to: {task.employee?.full_name ?? 'Unknown'}
-                                                                </p>
-                                                                {task.due_at && (
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        Due: {dueAt?.toLocaleString()}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                            <div className="flex flex-col items-end gap-2">
-                                                                <div className="flex items-center gap-2">
-                                                                    <select
-                                                                        value={task.status}
-                                                                        onChange={(event) =>
-                                                                            updateTaskStatus(task.id, event.target.value)
-                                                                        }
-                                                                        className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                                                <div className="flex flex-col items-end gap-2">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <select
+                                                                            value={task.status}
+                                                                            onChange={(event) =>
+                                                                                updateTaskStatus(task.id, event.target.value)
+                                                                            }
+                                                                            className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border bg-transparent px-2 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                                                                        >
+                                                                            {statuses.map((nextStatus) => (
+                                                                                <option key={nextStatus} value={nextStatus}>
+                                                                                    {nextStatus}
+                                                                                </option>
+                                                                            ))}
+                                                                        </select>
+                                                                        <Badge variant="secondary">{task.priority}</Badge>
+                                                                        {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                                    </div>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => startEditTask(task)}
+                                                                        className="h-8 w-8 p-0"
                                                                     >
-                                                                        {statuses.map((nextStatus) => (
-                                                                            <option key={nextStatus} value={nextStatus}>
-                                                                                {nextStatus}
-                                                                            </option>
-                                                                        ))}
-                                                                    </select>
-                                                                    <Badge variant="secondary">{task.priority}</Badge>
-                                                                    {overdue && <Badge variant="destructive">Overdue</Badge>}
+                                                                        <Pencil className="h-4 w-4" />
+                                                                    </Button>
                                                                 </div>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() => startEditTask(task)}
-                                                                    className="h-8 w-8 p-0"
-                                                                >
-                                                                    <Pencil className="h-4 w-4" />
-                                                                </Button>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
 
-                                            {columnTasks.length === 0 && (
-                                                <p className="text-sm text-muted-foreground">No tasks</p>
-                                            )}
+                                                {columnTasks.length === 0 && (
+                                                    <p className="text-sm text-muted-foreground">No tasks</p>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         {tasks.length === 0 && (

@@ -63,7 +63,7 @@ export default function Board({ employees }: BoardProps) {
 
                 <div className="flex flex-1 gap-6 overflow-hidden 2xl:gap-8 h-full min-h-0">
                     <div className="flex flex-1 flex-col gap-6 overflow-hidden h-full min-h-0">
-                        <div className="flex flex-1 gap-8 overflow-x-auto board-scroller pb-4 scrollbar-thin scrollbar-thumb-muted-foreground/20 2xl:gap-10 h-full">
+                        <div className="flex flex-1 gap-8 overflow-x-auto board-scroller pb-4 scrollbar-thin scrollbar-thumb-muted-foreground/20 2xl:gap-10 h-full pl-3">
                             {liveEmployees.map((employee) => (
                                 <EmployeeColumn
                                     key={employee.id}
