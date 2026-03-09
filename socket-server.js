@@ -2,7 +2,8 @@ import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { Server } from 'socket.io';
 
-const PORT = Number(process.env.SOCKET_PORT ?? 4001);
+const PORT = Number(process.env.SOCKET_IO_PORT ?? 6002);
+const HOST = process.env.SOCKET_IO_HOST ?? '0.0.0.0';
 const BOARD_DATA_URL = process.env.BOARD_DATA_URL ?? 'http://127.0.0.1:8000/api/board-data';
 const BOARD_POLL_MS = Number(process.env.BOARD_POLL_MS ?? 5000);
 
@@ -10,7 +11,7 @@ const httpServer = createServer();
 
 const io = new Server(httpServer, {
     cors: {
-        origin: '*',
+        origin: process.env.SOCKET_IO_CORS_ORIGIN || '*',
     },
 });
 
@@ -45,9 +46,8 @@ io.on('connection', (socket) => {
     }
 });
 
-httpServer.listen(PORT, '0.0.0.0', async () => {
-    console.log(`Socket server running on :${PORT}`);
-
+httpServer.listen(PORT, HOST, async () => {
+    console.log(`Socket server running on ${HOST}:${PORT}`);
     try {
         await broadcastBoardData();
     } catch (error) {
