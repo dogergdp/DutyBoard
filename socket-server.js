@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
     }
 });
 
-httpServer.listen(PORT, async () => {
+httpServer.listen(PORT, '0.0.0.0', async () => {
     console.log(`Socket server running on :${PORT}`);
 
     try {
