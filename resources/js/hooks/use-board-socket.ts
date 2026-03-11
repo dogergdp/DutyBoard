@@ -28,6 +28,7 @@ export function useBoardSocket(
     const [disappearingTaskIds, setDisappearingTaskIds] = useState<number[]>([]);
 
     const previousTasksRef = useRef<TaskSnapshot>({});
+    const previousEmployeeIdRef = useRef<number | null>(null);
     const hasReceivedFirstUpdateRef = useRef(false);
 
     const socketUrl = useMemo(
@@ -129,8 +130,10 @@ export function useBoardSocket(
 
             previousTasksRef.current = nextSnapshot;
 
-            if (liveEmployees[0]?.id !== nextEmployees[0]?.id) {
-                setAnimatedEmployeeId(nextEmployees[0]?.id ?? null);
+            const nextTopEmployeeId = nextEmployees[0]?.id ?? null;
+            if (previousEmployeeIdRef.current !== nextTopEmployeeId) {
+                previousEmployeeIdRef.current = nextTopEmployeeId;
+                setAnimatedEmployeeId(nextTopEmployeeId);
                 window.setTimeout(() => {
                     setAnimatedEmployeeId(null);
                 }, 1600);
@@ -194,7 +197,7 @@ export function useBoardSocket(
         return () => {
             socket.disconnect();
         };
-    }, [socketUrl, playStatusSound, liveEmployees]);
+    }, [socketUrl, playStatusSound]);
 
     return {
         liveEmployees,
