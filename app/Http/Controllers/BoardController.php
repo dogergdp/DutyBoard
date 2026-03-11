@@ -15,7 +15,14 @@ class BoardController extends Controller
         $employees = Employee::query()
             ->select(['id', 'full_name', 'photo_path'])
             ->orderBy('full_name')
-            ->get();
+            ->get()
+            ->map(function (Employee $employee) {
+                return [
+                    'id' => $employee->id,
+                    'full_name' => $employee->full_name,
+                    'photo_path' => $employee->photo_path ? asset('storage/' . $employee->photo_path) : null,
+                ];
+            });
 
         $tasks = Task::query()
             ->with('employee:id,full_name')
@@ -47,7 +54,10 @@ class BoardController extends Controller
     {
         $employees = Employee::with(['tasks' => function ($query) {
             $query->orderBy('due_at', 'asc');
-        }])->get();
+        }])->get()->map(function (Employee $employee) {
+            $employee->photo_path = $employee->photo_path ? asset('storage/' . $employee->photo_path) : null;
+            return $employee;
+        });
 
         return Inertia::render('board', [
             'employees' => $employees,

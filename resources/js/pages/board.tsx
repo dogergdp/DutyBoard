@@ -69,6 +69,7 @@ type TaskSnapshot = Record<
 >;
 
 export default function Board({ employees }: BoardProps) {
+    console.log('[Board] Component mounted');
     const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
 
     const JOKES = [
@@ -116,25 +117,28 @@ export default function Board({ employees }: BoardProps) {
     );
 
     const soundUrls = useMemo(
-        () => ({
-            ASSIGNED:
-                import.meta.env.VITE_SOUND_ASSIGNED ?? '/sounds/assigned.mp3',
-            IN_PROGRESS:
-                import.meta.env.VITE_SOUND_IN_PROGRESS ??
-                '/sounds/in-progress.mp3',
-            REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-            DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
-        }),
+        () => {
+            const cachebust = new Date().toISOString().split('T')[0];
+            return {
+                ASSIGNED: `/sounds/assigned.wav?v=${cachebust}`,
+                IN_PROGRESS: `/sounds/in-progress.wav?v=${cachebust}`,
+                REVIEW: `/sounds/review.wav?v=${cachebust}`,
+                DONE: `/sounds/done.wav?v=${cachebust}`,
+            };
+        },
         [],
     );
 
     const fallbackSoundUrls = useMemo(
-        () => ({
-            ASSIGNED: '/sounds/assigned.wav',
-            IN_PROGRESS: '/sounds/in-progress.wav',
-            REVIEW: '/sounds/review.wav',
-            DONE: '/sounds/done.wav',
-        }),
+        () => {
+            const cachebust = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            return {
+                ASSIGNED: `/sounds/assigned.wav?v=${cachebust}`,
+                IN_PROGRESS: `/sounds/in-progress.wav?v=${cachebust}`,
+                REVIEW: `/sounds/review.wav?v=${cachebust}`,
+                DONE: `/sounds/done.wav?v=${cachebust}`,
+            };
+        },
         [],
     );
 
@@ -152,7 +156,10 @@ export default function Board({ employees }: BoardProps) {
         const soundKey = status as (typeof SOUND_STATUSES)[number];
         const player = soundPlayersRef.current[soundKey];
 
+        console.log(`[Sound] Playing ${soundKey}:`, player?.src);
+
         if (!player) {
+            console.warn(`[Sound] No player for ${soundKey}`);
             return;
         }
 
@@ -259,6 +266,7 @@ export default function Board({ employees }: BoardProps) {
                         const player = await loadAudio(candidate);
                         loadedPlayers[status] = player;
                         loadedCount += 1;
+                        console.log(`[Sound] Loaded ${status}: ${candidate}`);
                         if (!cancelled) {
                             setReadySoundCount(loadedCount);
                         }
@@ -274,6 +282,7 @@ export default function Board({ employees }: BoardProps) {
             }
 
             soundPlayersRef.current = loadedPlayers;
+            console.log('[Sound] All sounds loaded:', loadedPlayers);
             setSoundsReady(true);
         };
 

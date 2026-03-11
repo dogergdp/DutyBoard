@@ -11,22 +11,28 @@ export const useBoardSounds = () => {
     const lastSoundTimeRef = useRef<number>(0);
 
     const soundUrls = useMemo(
-        () => ({
-            ASSIGNED: import.meta.env.VITE_SOUND_ASSIGNED ?? '/sounds/assigned.mp3',
-            IN_PROGRESS: import.meta.env.VITE_SOUND_IN_PROGRESS ?? '/sounds/in-progress.mp3',
-            REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-            DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
-        }),
+        () => {
+            const cachebust = new Date().toISOString().split('T')[0];
+            return {
+                ASSIGNED: `/sounds/assigned.wav?v=${cachebust}`,
+                IN_PROGRESS: `/sounds/in-progress.wav?v=${cachebust}`,
+                REVIEW: `/sounds/review.wav?v=${cachebust}`,
+                DONE: `/sounds/done.wav?v=${cachebust}`,
+            };
+        },
         [],
     );
 
     const fallbackSoundUrls = useMemo(
-        () => ({
-            ASSIGNED: '/sounds/assigned.wav',
-            IN_PROGRESS: '/sounds/in-progress.wav',
-            REVIEW: '/sounds/review.wav',
-            DONE: '/sounds/done.wav',
-        }),
+        () => {
+            const cachebust = new Date().toISOString().split('T')[0];
+            return {
+                ASSIGNED: `/sounds/assigned.wav?v=${cachebust}`,
+                IN_PROGRESS: `/sounds/in-progress.wav?v=${cachebust}`,
+                REVIEW: `/sounds/review.wav?v=${cachebust}`,
+                DONE: `/sounds/done.wav?v=${cachebust}`,
+            };
+        },
         [],
     );
 

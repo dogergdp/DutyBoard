@@ -30,7 +30,7 @@ export default function TaskCard({
     const age = formatDistanceToNow(new Date(task.created_at), { addSuffix: true });
 
     useEffect(() => {
-        if (task.status !== 'IN_PROGRESS') {
+        if (task.status !== 'IN_PROGRESS' && task.status !== 'REVIEW') {
             setProgressDots('');
             return;
         }
@@ -74,6 +74,15 @@ export default function TaskCard({
             return (
                 <span className={cn('whitespace-nowrap', colorConfig.text)}>
                     In Progress
+                    <span className="inline-block min-w-[1.5ch] text-left">{progressDots}</span>
+                </span>
+            );
+        }
+
+        if (task.status === 'REVIEW') {
+            return (
+                <span className={cn('whitespace-nowrap', colorConfig.text)}>
+                    Being Reviewed
                     <span className="inline-block min-w-[1.5ch] text-left">{progressDots}</span>
                 </span>
             );

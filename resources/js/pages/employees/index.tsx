@@ -52,7 +52,7 @@ export default function Index({ employees: employeeList }: Props) {
     );
     const [deleteError, setDeleteError] = useState<string>('');
 
-    const { data: employeeData, setData: setEmployeeData, post: postEmployee, processing: processingEmployee, reset: resetEmployee, errors: employeeErrors } = useForm({
+    const { data: employeeData, setData: setEmployeeData, post: postEmployee, patch: patchEmployee, processing: processingEmployee, reset: resetEmployee, errors: employeeErrors } = useForm({
         full_name: '',
         mobile: '',
         photo: null as File | null,
@@ -80,24 +80,23 @@ export default function Index({ employees: employeeList }: Props) {
     const submitEmployee: FormEventHandler = (e) => {
         e.preventDefault();
 
-        const url = editingEmployee
-            ? `/employees/${editingEmployee.id}`
-            : employees.store().url;
+        const onSuccess = () => {
+            resetEmployee();
+            setModalOpen(false);
+            setEditingEmployee(null);
+        };
 
-        postEmployee(url, {
-            data: editingEmployee
-                ? {
-                      _method: 'PATCH',
-                      ...employeeData,
-                  }
-                : employeeData,
-            forceFormData: true,
-            onSuccess: () => {
-                resetEmployee();
-                setModalOpen(false);
-                setEditingEmployee(null);
-            },
-        });
+        if (editingEmployee) {
+            patchEmployee(`/employees/${editingEmployee.id}`, {
+                forceFormData: true,
+                onSuccess,
+            });
+        } else {
+            postEmployee(employees.store().url, {
+                forceFormData: true,
+                onSuccess,
+            });
+        }
     };
 
     const deleteEmployee = (employee: Employee) => {

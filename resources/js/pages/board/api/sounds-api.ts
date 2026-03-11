@@ -18,11 +18,12 @@ export interface SoundUrls {
  * fallbacks).
  */
 export function getDefaultSoundUrls(): SoundUrls {
+  const cachebust = new Date().toISOString().split('T')[0];
   return {
-    ASSIGNED: import.meta.env.VITE_SOUND_ASSIGNED ?? '/sounds/assigned.mp3',
-    IN_PROGRESS: import.meta.env.VITE_SOUND_IN_PROGRESS ?? '/sounds/in-progress.mp3',
-    REVIEW: import.meta.env.VITE_SOUND_REVIEW ?? '/sounds/review.mp3',
-    DONE: import.meta.env.VITE_SOUND_DONE ?? '/sounds/done.mp3',
+    ASSIGNED: `/sounds/assigned.wav?v=${cachebust}`,
+    IN_PROGRESS: `/sounds/in-progress.wav?v=${cachebust}`,
+    REVIEW: `/sounds/review.wav?v=${cachebust}`,
+    DONE: `/sounds/done.wav?v=${cachebust}`,
   };
 }
 
