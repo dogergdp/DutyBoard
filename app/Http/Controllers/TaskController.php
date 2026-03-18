@@ -19,7 +19,7 @@ class TaskController extends Controller
         $overdueOnly = $request->boolean('overdue_only');
 
         $tasks = Task::query()
-            ->with('employee:id,full_name')
+            ->with('employee:id,full_name,photo_path')
             ->when($employeeId, fn ($query) => $query->where('assigned_to', $employeeId))
             ->when($status, fn ($query) => $query->where('status', $status))
             ->when($overdueOnly, fn ($query) => $query

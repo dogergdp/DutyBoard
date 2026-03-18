@@ -29,7 +29,7 @@ class EmployeeController extends Controller
     {
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
+            'mobile' => 'required|string|max:20|unique:employees,mobile',
             'photo' => 'nullable|image|max:2048',
         ]);
 
@@ -49,7 +49,7 @@ class EmployeeController extends Controller
     {
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20',
+            'mobile' => 'required|string|max:20|unique:employees,mobile,' . $employee->id,
             'photo' => 'nullable|image|max:2048',
         ]);
 
