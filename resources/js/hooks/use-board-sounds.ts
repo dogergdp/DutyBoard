@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 const SOUND_STATUSES = ['ASSIGNED', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
 
@@ -36,7 +36,7 @@ export const useBoardSounds = () => {
         [],
     );
 
-    const playStatusSound = (status: string) => {
+    const playStatusSound = useCallback((status: string) => {
         if (!soundsUnlocked) {
             return;
         }
@@ -61,9 +61,9 @@ export const useBoardSounds = () => {
             setSoundsUnlocked(false);
             setSoundStatusMessage('Sound blocked. Tap Enable Sound.');
         });
-    };
+    }, [soundsUnlocked]);
 
-    const tryUnlockSounds = async () => {
+    const tryUnlockSounds = useCallback(async () => {
         const players = SOUND_STATUSES
             .map((status) => soundPlayersRef.current[status])
             .filter((player): player is HTMLAudioElement => Boolean(player));
@@ -93,7 +93,7 @@ export const useBoardSounds = () => {
             setSoundStatusMessage('Browser blocked sound. Tap Enable Sound again.');
             return false;
         }
-    };
+    }, []);
 
     // Load audio files
     useEffect(() => {
