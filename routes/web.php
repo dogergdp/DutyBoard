@@ -73,6 +73,7 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::get('admin/tasks', [TaskController::class, 'index'])->name('admin.tasks.index');
     Route::post('admin/tasks', [TaskController::class, 'store'])->name('admin.tasks.store');
     Route::patch('admin/tasks/{task}', [TaskController::class, 'update'])->name('admin.tasks.update');
+    Route::delete('admin/tasks/{task}', [TaskController::class, 'destroy'])->name('admin.tasks.destroy');
     Route::patch('tasks/{task}/status', [BoardController::class, 'updateTaskStatus'])->name('tasks.update-status');
 
     Route::get('employees', [EmployeeController::class, 'index'])->name('employees.index');

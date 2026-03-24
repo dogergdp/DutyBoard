@@ -29,6 +29,7 @@ type Employee = {
     id: number;
     full_name: string;
     photo_url?: string | null;
+    mobile?: string;
 };
 
 type Task = {
@@ -54,6 +55,7 @@ type Props = {
     statuses: string[];
     priorities: string[];
     filters: Filters;
+    achievements: Record<string, string>;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -212,7 +214,7 @@ function AdminTaskCard({ task, onEdit, onStatusChange, statuses, renderAssignee 
     );
 }
 
-export default function AdminTasks({ tasks, employees, statuses, priorities, filters }: Props) {
+export default function AdminTasks({ tasks, employees, statuses, priorities, filters, achievements }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
     const [editProcessing, setEditProcessing] = useState(false);
@@ -231,6 +233,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
         description: '',
         priority: '',
         due_at: '',
+        assigned_to: '',
     });
 
     const getInitials = (name?: string | null) => {
@@ -244,14 +247,22 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
     };
 
     const renderAssignee = (employee?: Employee) => (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Avatar className="h-7 w-7 border shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-slate-700">
+            <Avatar className="h-9 w-9 border shadow-sm">
                 <AvatarImage src={employee?.photo_url ?? undefined} alt={employee?.full_name ?? 'Unknown'} />
                 <AvatarFallback className="bg-slate-200 text-[10px] font-semibold text-slate-700">
                     {getInitials(employee?.full_name ?? '')}
                 </AvatarFallback>
             </Avatar>
-            <span className="text-xs font-medium">{employee?.full_name?.split(' ')[0] ?? 'Unknown'}</span>
+            <div className="flex flex-col">
+                <span className="text-xs font-bold leading-tight">{employee?.full_name ?? 'Unknown'}</span>
+                <span className="text-[10px] text-slate-500 opacity-90">{employee?.mobile}</span>
+                {employee && achievements[employee.id] && (
+                    <Badge variant="secondary" className="mt-0.5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100 to-orange-100 text-amber-900 border border-amber-300 shadow-xs text-[9px] px-1.5 py-0 leading-tight w-fit uppercase font-black">
+                        {achievements[employee.id]}
+                    </Badge>
+                )}
+            </div>
         </div>
     );
 
@@ -281,6 +292,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
             description: task.description,
             priority: task.priority,
             due_at: toDateTimeLocalValue(task.due_at),
+            assigned_to: task.assigned_to?.toString() ?? '',
         });
         setEditingTaskId(task.id);
     };
@@ -297,6 +309,7 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                     description: editData.description,
                     priority: editData.priority,
                     due_at: editData.due_at || null,
+                    assigned_to: editData.assigned_to || null,
                 },
                 {
                     onSuccess: () => {
@@ -316,6 +329,17 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
     const cancelEdit = () => {
         resetEdit();
         setEditingTaskId(null);
+    };
+
+    const deleteTask = () => {
+        if (editingTaskId && confirm('Are you sure you want to delete this task?')) {
+            router.delete(`/admin/tasks/${editingTaskId}`, {
+                onSuccess: () => {
+                    cancelEdit();
+                },
+                preserveScroll: true,
+            });
+        }
     };
 
     const updateTaskStatus = (taskId: number, status: string) => {
@@ -605,6 +629,27 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                         </div>
 
                         <div className="grid gap-2">
+                            <Label htmlFor="edit-assigned-to">Assigned Employee</Label>
+                            <select
+                                id="edit-assigned-to"
+                                value={editData.assigned_to}
+                                onChange={(event) =>
+                                    setEditData('assigned_to', event.target.value)
+                                }
+                                className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                                required
+                            >
+                                <option value="">Select employee</option>
+                                {employees.map((employee) => (
+                                    <option key={employee.id} value={employee.id}>
+                                        {employee.full_name}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={editErrors.assigned_to} />
+                        </div>
+
+                        <div className="grid gap-2">
                             <Label htmlFor="edit-priority">Priority</Label>
                             <select
                                 id="edit-priority"
@@ -638,17 +683,28 @@ export default function AdminTasks({ tasks, employees, statuses, priorities, fil
                             <InputError message={editErrors.due_at} />
                         </div>
 
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={cancelEdit}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={editProcessing}>
-                                Save Changes
-                            </Button>
+                        <DialogFooter className="flex justify-between items-center w-full sm:justify-between pt-4">
+                            <div className="flex justify-start">
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={deleteTask}
+                                >
+                                    Delete Task
+                                </Button>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={cancelEdit}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={editProcessing}>
+                                    Save Changes
+                                </Button>
+                            </div>
                         </DialogFooter>
                     </form>
                 </DialogContent>

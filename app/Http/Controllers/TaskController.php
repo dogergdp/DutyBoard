@@ -19,7 +19,7 @@ class TaskController extends Controller
         $overdueOnly = $request->boolean('overdue_only');
 
         $tasks = Task::query()
-            ->with('employee:id,full_name,photo_path')
+            ->with('employee:id,full_name,photo_path,mobile')
             ->when($employeeId, fn ($query) => $query->where('assigned_to', $employeeId))
             ->when($status, fn ($query) => $query->where('status', $status))
             ->when($overdueOnly, fn ($query) => $query
@@ -30,9 +30,35 @@ class TaskController extends Controller
             ->latest('id')
             ->get();
 
+        $employees = Employee::query()->select(['id', 'full_name'])->orderBy('full_name')->get();
+
+        $todayTasksCount = Task::where('status', 'DONE')
+            ->whereDate('updated_at', \Carbon\Carbon::today())
+            ->selectRaw('assigned_to, count(*) as count')
+            ->groupBy('assigned_to')
+            ->pluck('count', 'assigned_to');
+
+        $hourTasksCount = Task::where('status', 'DONE')
+            ->where('updated_at', '>=', now()->subHour())
+            ->selectRaw('assigned_to, count(*) as count')
+            ->groupBy('assigned_to')
+            ->pluck('count', 'assigned_to');
+
+        $achievements = [];
+        foreach ($employees as $emp) {
+            $id = $emp->id;
+            $dayCount = $todayTasksCount[$id] ?? 0;
+            $hourCount = $hourTasksCount[$id] ?? 0;
+            
+            if ($dayCount >= 10) $achievements[$id] = '👑 Legend Mode';
+            elseif ($dayCount >= 5) $achievements[$id] = '💪 Machine Mode';
+            elseif ($hourCount >= 3) $achievements[$id] = '🔥 On Fire';
+        }
+
         return Inertia::render('admin/tasks/index', [
             'tasks' => $tasks,
-            'employees' => Employee::query()->select(['id', 'full_name'])->orderBy('full_name')->get(),
+            'employees' => $employees,
+            'achievements' => $achievements,
             'statuses' => self::STATUSES,
             'priorities' => self::PRIORITIES,
             'filters' => [
@@ -86,6 +112,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'nullable|string|in:LOW,MED,HIGH,URGENT',
             'due_at' => 'nullable|date',
+            'assigned_to' => 'nullable|exists:employees,id',
         ]);
 
         $task->update([
@@ -93,8 +120,15 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? $task->description,
             'priority' => $validated['priority'] ?? $task->priority,
             'due_at' => $validated['due_at'] ?? null,
+            'assigned_to' => $validated['assigned_to'] ?? $task->assigned_to,
         ]);
 
+        return redirect()->route('admin.tasks.index');
+    }
+
+    public function destroy(Task $task)
+    {
+        $task->delete();
         return redirect()->route('admin.tasks.index');
     }
 }

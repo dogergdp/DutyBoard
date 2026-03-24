@@ -132,7 +132,7 @@ export default function Index({ employees: employeeList }: Props) {
             <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold">Employees</h2>
-                    <Button type="button" onClick={openCreateModal}>Create Employee</Button>
+                    <Button type="button" onClick={openCreateModal}>Add an Employee</Button>
                 </div>
 
                 {deleteError && (
@@ -182,7 +182,7 @@ export default function Index({ employees: employeeList }: Props) {
                         <DialogTitle>
                             {editingEmployee
                                 ? 'Edit Employee'
-                                : 'Create Employee'}
+                                : 'Add an Employee'}
                         </DialogTitle>
                         <DialogDescription>
                             Enter employee details below.
