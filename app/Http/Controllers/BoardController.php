@@ -59,9 +59,12 @@ class BoardController extends Controller
             return $employee;
         });
 
+        $idleTimeout = \App\Models\User::first()?->board_idle_timeout ?? 10;
+
         return Inertia::render('board', [
             'employees' => $employees,
-            'priorities' => ['LOW', 'MED', 'HIGH', 'URGENT']
+            'priorities' => ['LOW', 'MED', 'HIGH', 'URGENT'],
+            'idleTimeout' => $idleTimeout,
         ]);
     }
 

@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { formatInManila } from '../utils';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -40,6 +40,28 @@ export default function BoardHeader({
     const [editTimeValue, setEditTimeValue] = useState(
         format(manilaNow, "yyyy-MM-dd'T'HH:mm")
     );
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((err: Error) => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+            void tryUnlockSounds();
+        } else {
+            if (document.exitFullscreen) {
+                void document.exitFullscreen();
+            }
+        }
+    };
 
     const handleSaveTime = () => {
         const newDate = new Date(editTimeValue);
@@ -57,6 +79,13 @@ export default function BoardHeader({
                         <h1 className="text-4xl font-bold tracking-tight lg:text-5xl 2xl:text-6xl">DutyBoard</h1>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={toggleFullscreen}
+                            className="rounded-md border border-border bg-background px-4 py-2 text-sm font-semibold shadow-md"
+                        >
+                            {isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+                        </button>
                         {soundsReady && !soundsUnlocked && (
                             <button
                                 type="button"

@@ -19,6 +19,7 @@ export interface Employee {
 export interface BoardProps {
     employees: Employee[];
     priorities: string[];
+    idleTimeout: number;
 }
 
 export interface ApiBoardEmployee {

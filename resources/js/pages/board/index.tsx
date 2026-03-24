@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 import { useBoardSounds } from '@/hooks/use-board-sounds';
 import { useBoardSocket } from '@/hooks/use-board-socket';
@@ -12,11 +13,13 @@ import { useBoardState } from './hooks/use-board-state';
 import { useRandomJoke } from './hooks/use-random-joke';
 import { useLeaderboardData } from './hooks/use-leaderboard-data';
 import { SOUND_STATUSES } from './constants';
+import IdleOverlay from './components/IdleOverlay';
 
 import type { BoardProps } from './types';
 
-export default function Board({ employees }: BoardProps) {
+export default function Board({ employees, idleTimeout }: BoardProps) {
     const randomJoke = useRandomJoke();
+    const [isIdle, setIsIdle] = useState(false);
     const { expandedTaskIds, manilaNow, setManilaNow, toggleTaskExpanded } = useBoardState();
 
     const {
@@ -42,6 +45,33 @@ export default function Board({ employees }: BoardProps) {
     const handleTimeChange = (newTime: Date) => {
         setManilaNow(newTime);
     };
+
+    const idleTimeoutMs = (idleTimeout ?? 10) * 60 * 1000;
+
+    useEffect(() => {
+        let timeoutId: number;
+
+        const resetIdleTimer = () => {
+            setIsIdle(false);
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => setIsIdle(true), idleTimeoutMs);
+        };
+
+        const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+        events.forEach(event => document.addEventListener(event, resetIdleTimer));
+        
+        resetIdleTimer();
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            events.forEach(event => document.removeEventListener(event, resetIdleTimer));
+        };
+    }, [idleTimeoutMs]);
+
+    // Wake up overlay if background events occur
+    useEffect(() => {
+        setIsIdle(false);
+    }, [liveEmployees, popupAnimations]);
 
     if (!soundsReady) {
         return <BoardLoadingState readySoundCount={readySoundCount} totalSounds={SOUND_STATUSES.length} />;
@@ -87,6 +117,7 @@ export default function Board({ employees }: BoardProps) {
                 
                 <BoardStyles />
                 <CompletionPopup popups={popupAnimations} />
+                <IdleOverlay isIdle={isIdle} />
             </div>
         </>
     );

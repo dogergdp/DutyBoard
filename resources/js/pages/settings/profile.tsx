@@ -91,6 +91,26 @@ export default function Profile({
                                     />
                                 </div>
 
+                                <div className="grid gap-2">
+                                    <Label htmlFor="board_idle_timeout">Board Idle Timeout (minutes)</Label>
+
+                                    <Input
+                                        id="board_idle_timeout"
+                                        type="number"
+                                        min="1"
+                                        className="mt-1 block w-full"
+                                        defaultValue={(auth.user as any).board_idle_timeout ?? 10}
+                                        name="board_idle_timeout"
+                                        required
+                                        placeholder="10"
+                                    />
+
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.board_idle_timeout}
+                                    />
+                                </div>
+
                                 {mustVerifyEmail &&
                                     auth.user.email_verified_at === null && (
                                         <div>

@@ -8,6 +8,8 @@ interface ProfilePopup {
     full_name: string;
     photo_path: string | null;
     key: string;
+    task_title: string;
+    ribbon_text: string;
 }
 
 interface BoardSocketResult {
@@ -194,11 +196,16 @@ export function useBoardSocket(
                     if (task) {
                         const employee = payload.employees.find((e) => e.id === task.assigned_to);
                         if (employee && !employeesWithCompletedTasks.has(employee.id)) {
+                            const ribbons = ["LEGEND", "BOSS MOVE", "CRUSHING IT", "ON FIRE", "UNSTOPPABLE", "MACHINE"];
+                            const randomRibbon = ribbons[Math.floor(Math.random() * ribbons.length)];
+                            
                             employeesWithCompletedTasks.set(employee.id, {
                                 id: employee.id,
                                 full_name: employee.full_name,
                                 photo_path: employee.photo_path,
                                 key: `${employee.id}-${Date.now()}-${Math.random()}`,
+                                task_title: task.title,
+                                ribbon_text: randomRibbon,
                             });
                         }
                     }
