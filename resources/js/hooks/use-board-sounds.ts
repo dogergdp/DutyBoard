@@ -8,7 +8,7 @@ export const useBoardSounds = () => {
     const [soundStatusMessage, setSoundStatusMessage] = useState('');
     const [readySoundCount, setReadySoundCount] = useState(0);
     const soundPlayersRef = useRef<Partial<Record<(typeof SOUND_STATUSES)[number], HTMLAudioElement>>>({});
-    const lastSoundTimeRef = useRef<number>(0);
+    const lastSoundTimeRef = useRef<Record<string, number>>({});
 
     const soundUrls = useMemo(
         () => {
@@ -42,10 +42,10 @@ export const useBoardSounds = () => {
         }
 
         const now = Date.now();
-        if (now - lastSoundTimeRef.current < 1000) {
+        if (now - (lastSoundTimeRef.current[status] || 0) < 2000) {
             return;
         }
-        lastSoundTimeRef.current = now;
+        lastSoundTimeRef.current[status] = now;
 
         const soundKey = status as (typeof SOUND_STATUSES)[number];
         const player = soundPlayersRef.current[soundKey];

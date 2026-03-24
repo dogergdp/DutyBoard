@@ -57,20 +57,24 @@ export default function CompletionPopup({ popups }: CompletionPopupProps) {
                         opacity: 0;
                         transform: scale(0.05) rotateZ(-45deg);
                     }
-                    30% {
+                    15% {
                         opacity: 1;
                         transform: scale(1.2) rotateZ(360deg);
                     }
-                    60% {
+                    25% {
                         transform: scale(1.1) rotateZ(360deg);
                     }
-                    100% {
+                    85% {
                         opacity: 1;
                         transform: scale(1) rotateZ(360deg);
                     }
+                    100% {
+                        opacity: 0;
+                        transform: scale(0.8) rotateZ(360deg);
+                    }
                 }
                 .animate-profile-popup {
-                    animation: profile-popup 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    animation: profile-popup 3.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
                 }
             `}} />
         </>

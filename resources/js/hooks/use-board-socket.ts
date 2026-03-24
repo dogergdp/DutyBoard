@@ -41,6 +41,7 @@ export function useBoardSocket(
     const previousTasksRef = useRef<TaskSnapshot>({});
     const previousEmployeeIdRef = useRef<number | null>(null);
     const hasReceivedFirstUpdateRef = useRef(false);
+    const popupLastTriggeredRef = useRef<number>(0);
 
     const socketUrl = useMemo(
         () => import.meta.env.VITE_SOCKET_URL ?? 'http://127.0.0.1:4001',
@@ -181,14 +182,6 @@ export function useBoardSocket(
             }
 
             if (tasksBecomingDone.length > 0) {
-                void confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    gravity: 0.8,
-                    ticks: 400,
-                });
-
                 // Create popup animations for employees with completed tasks
                 const employeesWithCompletedTasks = new Map<number, ProfilePopup>();
                 tasksBecomingDone.forEach((taskId) => {
@@ -211,14 +204,27 @@ export function useBoardSocket(
                     }
                 });
 
-                const newPopups = Array.from(employeesWithCompletedTasks.values());
-                setPopupAnimations((current) => [...current, ...newPopups]);
+                const now = Date.now();
+                if (employeesWithCompletedTasks.size > 0 && now - popupLastTriggeredRef.current > 4000) {
+                    popupLastTriggeredRef.current = now;
+                    // Only take the first one to prevent spam
+                    const newPopups = Array.from(employeesWithCompletedTasks.values()).slice(0, 1);
+                    setPopupAnimations((current) => [...current, ...newPopups]);
 
-                window.setTimeout(() => {
-                    setPopupAnimations((current) =>
-                        current.filter((popup) => !newPopups.some((p) => p.key === popup.key)),
-                    );
-                }, 1600);
+                    void confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        gravity: 0.8,
+                        ticks: 400,
+                    });
+
+                    window.setTimeout(() => {
+                        setPopupAnimations((current) =>
+                            current.filter((popup) => !newPopups.some((p) => p.key === popup.key)),
+                        );
+                    }, 3500);
+                }
 
                 setDisappearingTaskIds((current) =>
                     Array.from(new Set([...current, ...tasksBecomingDone])),
