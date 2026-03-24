@@ -19,8 +19,13 @@ import type { BoardProps } from './types';
 
 export default function Board({ employees, idleTimeout }: BoardProps) {
     const randomJoke = useRandomJoke();
-    const [isIdle, setIsIdle] = useState(false);
-    const { expandedTaskIds, manilaNow, setManilaNow, toggleTaskExpanded } = useBoardState();
+    
+    // Check URL for explicit preview parameter
+    const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+    const isPreviewIdle = searchParams.get('preview_idle') === 'true';
+    const [isIdle, setIsIdle] = useState(isPreviewIdle);
+    
+    const { expandedTaskIds, manilaNow, toggleTaskExpanded } = useBoardState();
 
     const {
         soundsReady,
@@ -42,13 +47,11 @@ export default function Board({ employees, idleTimeout }: BoardProps) {
 
     const leaderboardData = useLeaderboardData(liveEmployees);
 
-    const handleTimeChange = (newTime: Date) => {
-        setManilaNow(newTime);
-    };
-
     const idleTimeoutMs = (idleTimeout ?? 10) * 60 * 1000;
 
     useEffect(() => {
+        if (isPreviewIdle) return;
+        
         let timeoutId: number;
 
         const resetIdleTimer = () => {
@@ -70,7 +73,9 @@ export default function Board({ employees, idleTimeout }: BoardProps) {
 
     // Wake up overlay if background events occur
     useEffect(() => {
-        setIsIdle(false);
+        if (!isPreviewIdle) {
+            setIsIdle(false);
+        }
     }, [liveEmployees, popupAnimations]);
 
     if (!soundsReady) {
@@ -84,7 +89,6 @@ export default function Board({ employees, idleTimeout }: BoardProps) {
                 <BoardHeader
                     randomJoke={randomJoke}
                     manilaNow={manilaNow}
-                    onTimeChange={handleTimeChange}
                     soundsReady={soundsReady}
                     soundsUnlocked={soundsUnlocked}
                     soundStatusMessage={soundStatusMessage}

@@ -25,7 +25,6 @@ export const useBoardState = () => {
     return {
         expandedTaskIds,
         manilaNow,
-        setManilaNow,
         toggleTaskExpanded,
     };
 };

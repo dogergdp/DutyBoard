@@ -16,7 +16,6 @@ import { Label } from '@/components/ui/label';
 interface BoardHeaderProps {
     randomJoke: string;
     manilaNow: Date;
-    onTimeChange?: (newTime: Date) => void;
     soundsReady: boolean;
     soundsUnlocked: boolean;
     soundStatusMessage: string;
@@ -28,7 +27,6 @@ interface BoardHeaderProps {
 export default function BoardHeader({
     randomJoke,
     manilaNow,
-    onTimeChange,
     soundsReady,
     soundsUnlocked,
     soundStatusMessage,
@@ -36,10 +34,6 @@ export default function BoardHeader({
     tryUnlockSounds,
     playStatusSound,
 }: BoardHeaderProps) {
-    const [editTimeOpen, setEditTimeOpen] = useState(false);
-    const [editTimeValue, setEditTimeValue] = useState(
-        format(manilaNow, "yyyy-MM-dd'T'HH:mm")
-    );
     const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
@@ -60,14 +54,6 @@ export default function BoardHeader({
             if (document.exitFullscreen) {
                 void document.exitFullscreen();
             }
-        }
-    };
-
-    const handleSaveTime = () => {
-        const newDate = new Date(editTimeValue);
-        if (!isNaN(newDate.getTime())) {
-            onTimeChange?.(newDate);
-            setEditTimeOpen(false);
         }
     };
 
@@ -116,14 +102,7 @@ export default function BoardHeader({
                         )}
                     </div>
                     <div className="text-right">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setEditTimeValue(format(manilaNow, "yyyy-MM-dd'T'HH:mm"));
-                                setEditTimeOpen(true);
-                            }}
-                            className="text-sm font-semibold 2xl:text-base hover:text-primary transition-colors cursor-pointer"
-                        >
+                        <div className="text-sm font-semibold 2xl:text-base text-foreground">
                             {formatInManila(manilaNow, {
                                 month: 'short',
                                 day: 'numeric',
@@ -131,49 +110,13 @@ export default function BoardHeader({
                                 minute: '2-digit',
                                 hour12: true,
                             })}
-                        </button>
+                        </div>
                     </div>
                 </div>
                 <div className="rounded-lg border border-border/50 bg-gradient-to-r from-primary/5 to-primary/10 p-4">
                     <p className="text-center text-sm italic text-muted-foreground 2xl:text-base">{randomJoke}</p>
                 </div>
             </div>
-
-            <Dialog open={editTimeOpen} onOpenChange={setEditTimeOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Manila Time</DialogTitle>
-                        <DialogDescription>
-                            Change the current date and time displayed on the board.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="time-input">Date and Time</Label>
-                            <Input
-                                id="time-input"
-                                type="datetime-local"
-                                value={editTimeValue}
-                                onChange={(e) => setEditTimeValue(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setEditTimeOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="button" onClick={handleSaveTime}>
-                            Save Time
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }
