@@ -56,7 +56,7 @@ export default function Index({ employees: employeeList }: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
-    const { data: employeeData, setData: setEmployeeData, post: postEmployee, patch: patchEmployee, processing: processingEmployee, reset: resetEmployee, errors: employeeErrors } = useForm({
+    const { data: employeeData, setData: setEmployeeData, post: postEmployee, processing: processingEmployee, reset: resetEmployee, errors: employeeErrors, transform } = useForm({
         full_name: '',
         mobile: '',
         photo: null as File | null,
@@ -93,11 +93,16 @@ export default function Index({ employees: employeeList }: Props) {
         };
 
         if (editingEmployee) {
-            patchEmployee(`/employees/${editingEmployee.id}`, {
+            transform((data) => ({
+                ...data,
+                _method: 'patch',
+            }));
+            postEmployee(`/employees/${editingEmployee.id}`, {
                 forceFormData: true,
                 onSuccess,
             });
         } else {
+            transform((data) => data);
             postEmployee(employees.store().url, {
                 forceFormData: true,
                 onSuccess,
@@ -109,6 +114,9 @@ export default function Index({ employees: employeeList }: Props) {
         setDeleteError('');
 
         router.delete(`/employees/${employee.id}`, {
+            onSuccess: () => {
+                setModalOpen(false);
+            },
             onError: (errors) => {
                 setDeleteError(
                     (errors.delete as string) ||
@@ -153,13 +161,6 @@ export default function Index({ employees: employeeList }: Props) {
                                             onClick={() => openEditModal(employee)}
                                         >
                                             Edit
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            onClick={() => deleteEmployee(employee)}
-                                        >
-                                            Delete
                                         </Button>
                                     </div>
                                 </CardHeader>
@@ -248,19 +249,32 @@ export default function Index({ employees: employeeList }: Props) {
                             />
                         </div>
 
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => setModalOpen(false)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={processingEmployee}>
-                                {editingEmployee
-                                    ? 'Save changes'
-                                    : 'Add Employee'}
-                            </Button>
+                        <DialogFooter className="flex justify-between items-center w-full sm:justify-between">
+                            <div className="flex justify-start">
+                                {editingEmployee && (
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        onClick={() => deleteEmployee(editingEmployee)}
+                                    >
+                                        Delete Employee
+                                    </Button>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => setModalOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={processingEmployee}>
+                                    {editingEmployee
+                                        ? 'Save changes'
+                                        : 'Add Employee'}
+                                </Button>
+                            </div>
                         </DialogFooter>
                     </form>
                 </DialogContent>

@@ -53,7 +53,7 @@ class EmployeeController extends Controller
                 'required',
                 'string',
                 'max:20',
-                'unique:employees,mobile,' . $employee->id . ',id',
+                \Illuminate\Validation\Rule::unique('employees', 'mobile')->ignore($employee->id),
             ],
             'photo' => 'nullable|image|max:2048',
         ]);

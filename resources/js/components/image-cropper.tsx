@@ -32,10 +32,8 @@ export default function ImageCropper({ open, onClose, onCrop, imageFile }: Image
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                if (imageRef.current) {
-                    imageRef.current.src = e.target?.result as string;
-                    drawImage(img, scale, position.x, position.y);
-                }
+                imageRef.current = img;
+                drawImage(img, scale, position.x, position.y);
             };
             img.src = e.target?.result as string;
         };
@@ -83,15 +81,10 @@ export default function ImageCropper({ open, onClose, onCrop, imageFile }: Image
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!isDragging || !imageRef.current) return;
 
-        const dx = e.clientX - dragStart.x;
-        const dy = e.clientY - dragStart.y;
-
-        setPosition({
-            x: position.x + dx,
-            y: position.y + dy,
-        });
-
-        setDragStart({ x: e.clientX, y: e.clientY });
+        setPosition((prev) => ({
+            x: prev.x + e.movementX,
+            y: prev.y + e.movementY,
+        }));
     };
 
     const handleMouseUp = () => {
