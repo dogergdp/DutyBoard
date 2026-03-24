@@ -3,12 +3,20 @@ import { io } from 'socket.io-client';
 import confetti from 'canvas-confetti';
 import type { ApiBoardPayload, Employee, Task, TaskSnapshot } from '@/pages/board/types';
 
+interface ProfilePopup {
+    id: number;
+    full_name: string;
+    photo_path: string | null;
+    key: string;
+}
+
 interface BoardSocketResult {
     liveEmployees: Employee[];
     animatedEmployeeId: number | null;
     animatedTaskIds: number[];
     flippedTaskIds: number[];
     disappearingTaskIds: number[];
+    popupAnimations: ProfilePopup[];
 }
 
 /**
@@ -26,6 +34,7 @@ export function useBoardSocket(
     const [animatedTaskIds, setAnimatedTaskIds] = useState<number[]>([]);
     const [flippedTaskIds, setFlippedTaskIds] = useState<number[]>([]);
     const [disappearingTaskIds, setDisappearingTaskIds] = useState<number[]>([]);
+    const [popupAnimations, setPopupAnimations] = useState<ProfilePopup[]>([]);
 
     const previousTasksRef = useRef<TaskSnapshot>({});
     const previousEmployeeIdRef = useRef<number | null>(null);
@@ -178,6 +187,32 @@ export function useBoardSocket(
                     ticks: 400,
                 });
 
+                // Create popup animations for employees with completed tasks
+                const employeesWithCompletedTasks = new Map<number, ProfilePopup>();
+                tasksBecomingDone.forEach((taskId) => {
+                    const task = payload.tasks.find((t) => t.id === taskId);
+                    if (task) {
+                        const employee = payload.employees.find((e) => e.id === task.assigned_to);
+                        if (employee && !employeesWithCompletedTasks.has(employee.id)) {
+                            employeesWithCompletedTasks.set(employee.id, {
+                                id: employee.id,
+                                full_name: employee.full_name,
+                                photo_path: employee.photo_path,
+                                key: `${employee.id}-${Date.now()}-${Math.random()}`,
+                            });
+                        }
+                    }
+                });
+
+                const newPopups = Array.from(employeesWithCompletedTasks.values());
+                setPopupAnimations((current) => [...current, ...newPopups]);
+
+                window.setTimeout(() => {
+                    setPopupAnimations((current) =>
+                        current.filter((popup) => !newPopups.some((p) => p.key === popup.key)),
+                    );
+                }, 1600);
+
                 setDisappearingTaskIds((current) =>
                     Array.from(new Set([...current, ...tasksBecomingDone])),
                 );
@@ -205,5 +240,6 @@ export function useBoardSocket(
         animatedTaskIds,
         flippedTaskIds,
         disappearingTaskIds,
+        popupAnimations,
     };
 }

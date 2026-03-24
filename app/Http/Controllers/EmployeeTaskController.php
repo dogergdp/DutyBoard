@@ -24,6 +24,7 @@ class EmployeeTaskController extends Controller
                 'id' => $employee->id,
                 'full_name' => $employee->full_name,
                 'mobile' => $employee->mobile,
+                'photo_url' => $employee->photo_url,
             ],
             'tasks' => $tasks,
         ]);

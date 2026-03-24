@@ -7,6 +7,7 @@ type Employee = {
     id: number;
     full_name: string;
     mobile: string | null;
+    photo_url?: string | null;
 };
 
 type Task = {
@@ -52,9 +53,16 @@ export default function EmployeeTasks({ employee, tasks }: Props) {
             <div className="mx-auto max-w-7xl space-y-6 p-6">
                 {/* Header/Filters Section */}
                 <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold">My Tasks</h1>
-                        <p className="text-sm text-muted-foreground">{employee.full_name}</p>
+                    <div className="flex items-center gap-4">
+                        <img
+                            src={employee.photo_url || 'https://placehold.co/80x80?text=No+Photo'}
+                            alt={employee.full_name}
+                            className="h-12 w-12 rounded-full object-cover"
+                        />
+                        <div className="space-y-1">
+                            <h1 className="text-2xl font-semibold">My Tasks</h1>
+                            <p className="text-sm text-muted-foreground">{employee.full_name}</p>
+                        </div>
                     </div>
                     <Button type="button" variant="outline" onClick={logout}>
                         Log out

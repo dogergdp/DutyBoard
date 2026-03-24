@@ -7,6 +7,7 @@ import EmployeeColumn from './components/EmployeeColumn';
 import Leaderboard from './components/Leaderboard';
 import BoardLoadingState from './components/BoardLoadingState';
 import BoardStyles from './components/BoardStyles';
+import CompletionPopup from './components/CompletionPopup';
 import { useBoardState } from './hooks/use-board-state';
 import { useRandomJoke } from './hooks/use-random-joke';
 import { useLeaderboardData } from './hooks/use-leaderboard-data';
@@ -33,6 +34,7 @@ export default function Board({ employees }: BoardProps) {
         animatedTaskIds,
         flippedTaskIds,
         disappearingTaskIds,
+        popupAnimations,
     } = useBoardSocket(employees, playStatusSound);
 
     const leaderboardData = useLeaderboardData(liveEmployees);
@@ -84,6 +86,7 @@ export default function Board({ employees }: BoardProps) {
                 </div>
                 
                 <BoardStyles />
+                <CompletionPopup popups={popupAnimations} />
             </div>
         </>
     );
