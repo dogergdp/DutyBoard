@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import ImageCropper from '@/components/image-cropper';
 import AppLayout from '@/layouts/app-layout';
 import employees from '@/routes/employees';
 import type { BreadcrumbItem } from '@/types';
@@ -51,6 +52,9 @@ export default function Index({ employees: employeeList }: Props) {
         null,
     );
     const [deleteError, setDeleteError] = useState<string>('');
+    const [cropperOpen, setCropperOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
     const { data: employeeData, setData: setEmployeeData, post: postEmployee, patch: patchEmployee, processing: processingEmployee, reset: resetEmployee, errors: employeeErrors } = useForm({
         full_name: '',
@@ -61,10 +65,11 @@ export default function Index({ employees: employeeList }: Props) {
     const openCreateModal = () => {
         setEditingEmployee(null);
         setDeleteError('');
-        resetEmployee();
         setEmployeeData('full_name', '');
         setEmployeeData('mobile', '');
         setEmployeeData('photo', null);
+        setPreviewPhoto(null);
+        resetEmployee();
         setModalOpen(true);
     };
 
@@ -74,6 +79,7 @@ export default function Index({ employees: employeeList }: Props) {
         setEmployeeData('full_name', employee.full_name);
         setEmployeeData('mobile', employee.mobile);
         setEmployeeData('photo', null);
+        setPreviewPhoto(employee.photo_url || null);
         setModalOpen(true);
     };
 
@@ -151,36 +157,25 @@ export default function Index({ employees: employeeList }: Props) {
                                         <Button
                                             type="button"
                                             variant="destructive"
-                                            disabled={employee.tasks.length > 0}
                                             onClick={() => deleteEmployee(employee)}
                                         >
                                             Delete
                                         </Button>
                                     </div>
                                 </CardHeader>
-                                <CardContent>
-                                    <h3 className="font-semibold mb-2">Tasks:</h3>
-                                    {employee.tasks.length > 0 ? (
-                                        <ul className="list-disc pl-5 space-y-1">
-                                            {employee.tasks.map((task) => (
-                                                <li key={task.id} className="text-sm">
-                                                    <strong>{task.title}</strong>{' '}
-                                                    {task.due_at ? `- ${task.due_at}` : ''}
-                                                    <p className="text-xs text-muted-foreground">{task.description}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">No tasks assigned.</p>
-                                    )}
-                                </CardContent>
                             </Card>
                         ))}
                     </div>
                 </div>
             </div>
 
-            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+            <Dialog open={modalOpen} onOpenChange={(open) => {
+                if (!open) {
+                    setPreviewPhoto(null);
+                    setSelectedFile(null);
+                }
+                setModalOpen(open);
+            }}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
@@ -230,13 +225,23 @@ export default function Index({ employees: employeeList }: Props) {
                                 id="photo"
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) =>
-                                    setEmployeeData(
-                                        'photo',
-                                        e.target.files?.[0] ?? null,
-                                    )
-                                }
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setSelectedFile(file);
+                                        setCropperOpen(true);
+                                    }
+                                }}
                             />
+                            {previewPhoto && (
+                                <div className="mt-3">
+                                    <img
+                                        src={previewPhoto}
+                                        alt="Preview"
+                                        className="h-32 w-32 rounded-full object-cover border-2 border-primary"
+                                    />
+                                </div>
+                            )}
                             <InputError
                                 message={employeeErrors.photo}
                                 className="mt-2"
@@ -260,6 +265,22 @@ export default function Index({ employees: employeeList }: Props) {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <ImageCropper
+                open={cropperOpen}
+                onClose={() => setCropperOpen(false)}
+                imageFile={selectedFile}
+                onCrop={(croppedFile) => {
+                    setEmployeeData('photo', croppedFile);
+                    // Create preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        setPreviewPhoto(e.target?.result as string);
+                    };
+                    reader.readAsDataURL(croppedFile);
+                    setSelectedFile(null);
+                }}
+            />
         </AppLayout>
     );
 }

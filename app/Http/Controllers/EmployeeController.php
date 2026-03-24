@@ -49,7 +49,12 @@ class EmployeeController extends Controller
     {
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:20|unique:employees,mobile,' . $employee->id,
+            'mobile' => [
+                'required',
+                'string',
+                'max:20',
+                'unique:employees,mobile,' . $employee->id . ',id',
+            ],
             'photo' => 'nullable|image|max:2048',
         ]);
 
