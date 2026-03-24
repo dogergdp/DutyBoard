@@ -1,17 +1,5 @@
-import { format } from 'date-fns';
 import { formatInManila } from '../utils';
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface BoardHeaderProps {
     randomJoke: string;
@@ -27,12 +15,7 @@ interface BoardHeaderProps {
 export default function BoardHeader({
     randomJoke,
     manilaNow,
-    soundsReady,
-    soundsUnlocked,
-    soundStatusMessage,
-    readySoundCount,
     tryUnlockSounds,
-    playStatusSound,
 }: BoardHeaderProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -64,50 +47,59 @@ export default function BoardHeader({
                     <div className="flex-shrink-0">
                         <h1 className="text-4xl font-bold tracking-tight lg:text-5xl 2xl:text-6xl">DutyBoard</h1>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         <button
                             type="button"
                             onClick={toggleFullscreen}
-                            className="rounded-md border border-border bg-background px-4 py-2 text-sm font-semibold shadow-md"
+                            title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+                            className="rounded-xl border border-border bg-background p-4 shadow-md hover:bg-accent transition-colors"
                         >
-                            {isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
-                        </button>
-                        {soundsReady && !soundsUnlocked && (
-                            <button
-                                type="button"
-                                onClick={() => void tryUnlockSounds()}
-                                className="rounded-md border border-border bg-background px-4 py-2 text-sm font-semibold shadow-md"
-                            >
-                                Enable Sound
-                            </button>
-                        )}
-                        {soundsReady && soundsUnlocked && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        playStatusSound('ASSIGNED');
-                                        // if desired, parent can display message
-                                    }}
-                                    className="rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold shadow-md"
+                            {isFullscreen ? (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="36"
+                                    height="36"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
                                 >
-                                    Test Sound
-                                </button>
-                                {soundStatusMessage && (
-                                    <div className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground shadow-md">
-                                        {soundStatusMessage}
-                                    </div>
-                                )}
-                            </>
-                        )}
+                                    <path d="M8 3v3a2 2 0 0 1-2 2H3" />
+                                    <path d="M21 8h-3a2 2 0 0 1-2-2V3" />
+                                    <path d="M3 16h3a2 2 0 0 1 2 2v3" />
+                                    <path d="M16 21v-3a2 2 0 0 1 2-2h3" />
+                                </svg>
+                            ) : (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="36"
+                                    height="36"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                                    <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                                    <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                                    <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                                </svg>
+                            )}
+                        </button>
                     </div>
                     <div className="text-right">
                         <div className="text-sm font-semibold 2xl:text-base text-foreground">
                             {formatInManila(manilaNow, {
                                 month: 'short',
                                 day: 'numeric',
+                                year: 'numeric',
                                 hour: 'numeric',
                                 minute: '2-digit',
+                                second: '2-digit',
                                 hour12: true,
                             })}
                         </div>

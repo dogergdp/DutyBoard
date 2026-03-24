@@ -15,7 +15,7 @@ export const useBoardState = () => {
     useEffect(() => {
         const interval = window.setInterval(() => {
             setManilaNow(new Date());
-        }, 60_000);
+        }, 1_000);
 
         return () => {
             window.clearInterval(interval);

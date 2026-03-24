@@ -55,26 +55,26 @@ export default function CompletionPopup({ popups }: CompletionPopupProps) {
                 @keyframes profile-popup {
                     0% {
                         opacity: 0;
-                        transform: scale(0.05) rotateZ(-45deg);
+                        transform: translateY(80px) scale(0.92);
                     }
-                    15% {
+                    18% {
                         opacity: 1;
-                        transform: scale(1.2) rotateZ(360deg);
+                        transform: translateY(-8px) scale(1.03);
                     }
-                    25% {
-                        transform: scale(1.1) rotateZ(360deg);
+                    28% {
+                        transform: translateY(0) scale(1);
                     }
-                    85% {
+                    80% {
                         opacity: 1;
-                        transform: scale(1) rotateZ(360deg);
+                        transform: translateY(0) scale(1);
                     }
                     100% {
                         opacity: 0;
-                        transform: scale(0.8) rotateZ(360deg);
+                        transform: translateY(-24px) scale(0.96);
                     }
                 }
                 .animate-profile-popup {
-                    animation: profile-popup 3.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    animation: profile-popup 3.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
                 }
             `}} />
         </>
